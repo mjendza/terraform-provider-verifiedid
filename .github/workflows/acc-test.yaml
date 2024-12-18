@@ -16,7 +16,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - run: chmod -R +x ./scripts
-      - run: make acctests
+      - run: make testacc
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
