@@ -1,64 +1,179 @@
-# Terraform Provider Scaffolding (Terraform Plugin Framework)
+# Terraform Provider for MSGraph Rest API
 
-_This template repository is built on the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework). The template repository built on the [Terraform Plugin SDK](https://github.com/hashicorp/terraform-plugin-sdk) can be found at [terraform-provider-scaffolding](https://github.com/hashicorp/terraform-provider-scaffolding). See [Which SDK Should I Use?](https://developer.hashicorp.com/terraform/plugin/framework-benefits) in the Terraform documentation for additional information._
+The MSGraph provider is a very thin layer on top of the MSGraph REST APIs. Use this new provider to authenticate to and manage MSGraph resources and functionality using the MSGraph APIs directly.
 
-This repository is a *template* for a [Terraform](https://www.terraform.io) provider. It is intended as a starting point for creating Terraform providers, containing:
 
-- A resource and a data source (`internal/provider/`),
-- Examples (`examples/`) and generated documentation (`docs/`),
-- Miscellaneous meta files.
+## Get started with MSGraph
 
-These files contain boilerplate code that you will need to edit to create your own Terraform provider. Tutorials for creating Terraform providers can be found on the [HashiCorp Developer](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework) platform. _Terraform Plugin Framework specific guides are titled accordingly._
+* [MSGraph VSCode Extension](https://github.com/ms-henglu/msgraph-vscode) provides a rich authoring experience to help you use the MSGraph provider.
 
-Please see the [GitHub template repository documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template) for how to create a new repository from this template on GitHub.
+Also, there is a rich library of [examples](https://github.com/ms-henglu/terraform-provider-msgraph/tree/main/examples) to help you get started.
 
-Once you've written your provider, you'll want to [publish it on the Terraform Registry](https://developer.hashicorp.com/terraform/registry/providers/publishing) so that others can use it.
+## Usage Example
 
-## Requirements
+The following example shows how to use `msgraph_resource` to manage application resource.
 
-- [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.19
+```hcl
+terraform {
+  required_providers {
+    msgraph = {
+      source  = "Microsoft/msgraph"
+    }
+  }
+}
 
-## Building The Provider
+provider "msgraph" {
+  # More information on the authentication methods supported by
+  # the MSGraph Provider can be found here:
+  # https://registry.terraform.io/providers/Microsoft/msgraph/latest/docs
 
-1. Clone the repository
-1. Enter the repository directory
-1. Build the provider using the Go `install` command:
+  # client_id       = "..."
+  # client_secret   = "..."
+  # tenant_id       = "..."
+}
 
-```shell
-go install
+resource "msgraph_resource" "application" {
+  url  = "applications"
+  body = {
+    displayName = "My Application"
+  }
+}
+
 ```
 
-## Adding Dependencies
+Further [usage documentation is available on the Terraform website](https://registry.terraform.io/providers/Microsoft/msgraph/latest/docs).
 
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
+## Developer Requirements
 
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
+* [Terraform](https://www.terraform.io/downloads.html) version 0.12.x + (but 1.x is recommended)
+* [Go](https://golang.org/doc/install) version 1.18.x (to build the provider plugin)
 
-```shell
-go get github.com/author/dependency
-go mod tidy
+### On Windows
+
+If you're on Windows you'll also need:
+
+* [Git Bash for Windows](https://git-scm.com/download/win)
+* [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm)
+
+For *GNU32 Make*, make sure its bin path is added to PATH environment variable.*
+
+For *Git Bash for Windows*, at the step of "Adjusting your PATH environment", please choose "Use Git and optional Unix tools from Windows Command Prompt".*
+
+Or install via [Chocolatey](https://chocolatey.org/install) (`Git Bash for Windows` must be installed per steps above)
+
+```powershell
+choco install make golang terraform -y
+refreshenv
 ```
 
-Then commit the changes to `go.mod` and `go.sum`.
-
-## Using the provider
-
-Fill this in for each provider
+You must run `Developing the Provider` commands in `bash` because `sh` scrips are invoked as part of these.
 
 ## Developing the Provider
 
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (see [Requirements](#requirements) above).
+If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.18+ is **required**). You'll also need to correctly setup a [GOPATH](http://golang.org/doc/code.html#GOPATH), as well as adding `$GOPATH/bin` to your `$PATH`.
 
-To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
+First clone the repository to: `$GOPATH/src/github.com/ms-henglu/terraform-provider-msgraph`
 
-To generate or update documentation, run `go generate`.
-
-In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
-
-```shell
-make testacc
+```sh
+mkdir -p $GOPATH/src/github.com/Microsoft; cd $GOPATH/src/github.com/Microsoft
+git clone git@github.com:ms-henglu/terraform-provider-msgraph.git
+cd $GOPATH/src/github.com/Microsoft/terraform-provider-msgraph
 ```
+
+Once inside the provider directory, you can run `make tools` to install the dependent tooling required to compile the provider.
+
+At this point you can compile the provider by running `make build`, which will build the provider and put the provider binary in the `$GOPATH/bin` directory.
+
+```sh
+$ make build
+...
+$ $GOPATH/bin/terraform-provider-msgraph
+...
+```
+
+You can also cross-compile if necessary:
+
+```sh
+GOOS=windows GOARCH=amd64 make build
+```
+
+In order to run the `Unit Tests` for the provider, you can run:
+
+```sh
+make test
+```
+
+The majority of tests in the provider are `Acceptance Tests` - which provisions real resources in Azure. It's possible to run the entire acceptance test suite by running `make testacc` - however it's likely you'll want to run a subset, which you can do using a prefix, by running:
+
+```sh
+make acctests TESTARGS='-run=<nameOfTheTest>' TESTTIMEOUT='60m'
+```
+
+* `<nameOfTheTest>` should be self-explanatory as it is the name of the test you want to run. An example could be `TestAccGenericResource_basic`. Since `-run` can be used with regular expressions you can use it to specify multiple tests like in `TestAccGenericResource_` to run all tests that match that expression
+
+The following Environment Variables must be set in your shell prior to running acceptance tests:
+
+* `ARM_CLIENT_ID`
+* `ARM_CLIENT_SECRET`
+* `ARM_TENANT_ID`
+
+**Note:** Acceptance tests create real resources in Azure which often cost money to run.
+
+## Generating Documentation
+
+We use [tfplugindocs](https://github.com/hashicorp/terraform-plugin-docs) to automatically generate documentation for the provider.
+Please ensure that the `MarkdownDescription` field is set in the schema for each resource and data source.
+
+To generate the documentation run either:
+
+```sh
+$ make docs
+```
+
+or...
+
+```sh
+$ go generate ./...
+```
+
+### Templates
+
+Each resource is documented using a template. The template is located in the `templates` directory. The template is a markdown file with placeholders that are replaced with the actual values from the schema. There is a general template for all resources/data sources, and an optional specific template for each resource/data source where customization is required.
+
+### Guides
+
+Guides should be stored in the `templates/guides` directory. They will be inclided in the documentation and copied to the `docs` directory by the `tfplugindocs` tool.
+
+### Examples
+
+The `examples/resources` and `examples/data-sources` directory contains examples for each resource and data source. The examples are used to generate the documentation for each resource and data source. The examples are written in HCL and must be called `resource.tf` or `data-source.tf`. These are then embedded into the documentation and are used to generate the `Example` section.
+
+---
+
+## Developer: Using the locally compiled Azure Provider binary
+
+When using Terraform 0.14 and later, after successfully compiling the Azure Provider, you must [instruct Terraform to use your locally compiled provider binary](https://www.terraform.io/docs/commands/cli-config.html#development-overrides-for-provider-developers) instead of the official binary from the Terraform Registry.
+
+For example, add the following to `~/.terraformrc` for a provider binary located in `/home/developer/go/bin`:
+
+```
+provider_installation {
+
+  # Use /home/developer/go/bin as an overridden package directory
+  # for the Microsoft/msgraph provider. This disables the version and checksum
+  # verifications for this provider and forces Terraform to look for the
+  # msgraph provider plugin in the given directory.
+  dev_overrides {
+    "Microsoft/msgraph" = "/home/developer/go/bin"
+  }
+
+  # For all other providers, install them directly from their origin provider
+  # registries as normal. If you omit this, Terraform will _only_ use
+  # the dev_overrides block, and so no other providers will be available.
+  direct {}
+}
+```
+
+## Credits
+
+We wish to thank HashiCorp for the use of some MPLv2-licensed code from their open source project [terraform-provider-azuread](https://github.com/hashicorp/terraform-provider-azuread).
