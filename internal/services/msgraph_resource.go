@@ -66,7 +66,8 @@ func (r *MSGraphResource) Schema(ctx context.Context, req resource.SchemaRequest
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				MarkdownDescription: docstrings.ResourceID(),
+				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},

@@ -10,7 +10,18 @@ func Url(kind string) string {
 	if kind == "data" {
 		return "The URL of the data source. It supports both collection URL which is used to list resources, for example `/users`, and item URL which is used to read an individual resource, for example `/users/{id}`."
 	}
-	return "The collection URL of the resource. For example, `/users`, `/groups`, `/applications`."
+	return `The URL which is used to manage the resource. It supports two types of URLs:  
+  - Collection URL which is used to make a POST request to create a new resource, for example, "/users", it must support the following operations:
+	- Create a new resource: POST "/users"
+    - Read an existing resource: GET "/users/{id}"
+    - Update an existing resource: PATCH "/users/{id}"
+    - Delete an existing resource: DELETE "/users/{id} "
+  - URL which has a "$ref" suffix, for example, "/groups/{group-id}/members/$ref", it must support the following operations:
+	- Add a reference to a resource: POST "/groups/{group-id}/members/$ref"
+	- Remove a reference to a resource: DELETE "/groups/{group-id}/members/{id}/$ref"
+  
+  More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).
+`
 }
 
 func Body() string {
@@ -51,4 +62,8 @@ func ResponseExportValues() string {
 
 To learn more about JMESPath, visit [JMESPath](https://jmespath.org/).
 `, "`")
+}
+
+func ResourceID() string {
+	return "The ID of the resource. Normally, it is in the format of UUID."
 }

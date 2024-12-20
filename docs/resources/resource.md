@@ -49,7 +49,17 @@ This resource can manage any Microsoft Graph API resource.
 
 ### Required
 
-- `url` (String) The collection URL of the resource. For example, `/users`, `/groups`, `/applications`.
+- `url` (String) The URL which is used to manage the resource. It supports two types of URLs:  
+  - Collection URL which is used to make a POST request to create a new resource, for example, "/users", it must support the following operations:
+	- Create a new resource: POST "/users"
+    - Read an existing resource: GET "/users/{id}"
+    - Update an existing resource: PATCH "/users/{id}"
+    - Delete an existing resource: DELETE "/users/{id} "
+  - URL which has a "$ref" suffix, for example, "/groups/{group-id}/members/$ref", it must support the following operations:
+	- Add a reference to a resource: POST "/groups/{group-id}/members/$ref"
+	- Remove a reference to a resource: DELETE "/groups/{group-id}/members/{id}/$ref"
+  
+  More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).
 
 ### Optional
 
@@ -73,7 +83,7 @@ To learn more about JMESPath, visit [JMESPath](https://jmespath.org/).
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of the resource. Normally, it is in the format of UUID.
 - `output` (Dynamic) The output HCL object containing the properties specified in `response_export_values`. Here are some examples to use the values.
 
 	```terraform
