@@ -1,9 +1,13 @@
+TESTTIMEOUT=300m
+TESTARGS?=
+TEST?=$$(go list ./... |grep -v 'vendor'|grep -v 'examples')
+
 default: testacc
 
 # Run acceptance tests
 .PHONY: testacc fmt terrafmt docs tools depscheck tflint test fmtcheck lint
-testacc:
-	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m
+testacc: fmtcheck
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout $(TESTTIMEOUT) -ldflags="-X=github.com/microsoft/terraform-provider-msgraph/version.ProviderVersion=acc"
 
 
 fmt:

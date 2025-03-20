@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/azure/terraform-provider-msgraph/internal/acceptance"
-	"github.com/azure/terraform-provider-msgraph/internal/acceptance/check"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance"
+	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance/check"
 )
 
 type MSGraphTestDataSource struct{}
@@ -47,7 +47,7 @@ func (r MSGraphTestDataSource) basic(data acceptance.TestData) string {
 %s
 
 data "msgraph_resource" "test" {
-  url = msgraph_resource.test.id
+  url = "applications/${msgraph_resource.test.id}"
 }
 `, MSGraphTestResource{}.basic(data))
 }
