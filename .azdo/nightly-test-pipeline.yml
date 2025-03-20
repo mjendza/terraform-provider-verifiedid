@@ -1,0 +1,46 @@
+jobs:
+  - job: build
+    timeoutInMinutes: 300
+    displayName: "Build: "
+
+    pool:
+      name: pool-ubuntu-2004
+
+    steps:
+      - task: GoTool@0
+        displayName: "Install correct version of Go"
+        inputs:
+          version: '1.22'
+          GOPATH: "$(Pipeline.Workspace)/gopath"
+          GOBIN: "$(GOPATH)/bin"
+
+      - bash: |
+          #!/usr/bin/env bash
+          make tools
+        displayName: "Install Dependencies"
+
+      - bash: |
+          #!/usr/bin/env bash
+          make depscheck
+        displayName: "Verify Vendor Dependencies"
+
+      - bash: |
+          #!/usr/bin/env bash
+          make fmtcheck
+        displayName: "Run Format Check"
+
+      - bash: |
+          #!/usr/bin/env bash
+          make lint
+        displayName: "Run Lint Check"
+
+      - bash: |
+          #!/usr/bin/env bash
+          make testacc
+        displayName: "Run All Tests"
+        env:
+          ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+          ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+          ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+          ARM_TENANT_ID: $(ARM_TENANT_ID)
+          TESTARGS: $(TESTARGS)
