@@ -20,7 +20,8 @@ func Url(kind string) string {
 	- Add a reference to a resource: POST "/groups/{group-id}/members/$ref"
 	- Remove a reference to a resource: DELETE "/groups/{group-id}/members/{id}/$ref"
   
-  More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).
+  More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).  
+  And there are some [examples](https://github.com/microsoft/terraform-provider-msgraph/tree/main/examples/quickstarts) to help you get started.
 `
 }
 

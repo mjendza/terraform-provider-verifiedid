@@ -59,7 +59,8 @@ This resource can manage any Microsoft Graph API resource.
 	- Add a reference to a resource: POST "/groups/{group-id}/members/$ref"
 	- Remove a reference to a resource: DELETE "/groups/{group-id}/members/{id}/$ref"
   
-  More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).
+  More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).  
+  And there are some [examples](https://github.com/microsoft/terraform-provider-msgraph/tree/main/examples/quickstarts) to help you get started.
 
 ### Optional
 
@@ -98,4 +99,10 @@ To learn more about JMESPath, visit [JMESPath](https://jmespath.org/).
 	 }
 	```
 
+## Import
 
+ ```shell
+ # MSGraph resource can be imported using the resource id, e.g.
+ terraform import msgraph_resource.servicePrincipal /servicePrincipals/00000000-0000-0000-0000-000000000000
+ terraform import msgraph_resource.member /groups/group-id/members/$ref/00000000-0000-0000-0000-000000000000
+ ```
