@@ -16,6 +16,8 @@ import (
 // can be customized.
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 
+//go:generate go run ./tools/generator-example-doc/main.go -input-dir=./examples/quickstarts -output-dir=./docs/resources
+
 func main() {
 	var debug bool
 

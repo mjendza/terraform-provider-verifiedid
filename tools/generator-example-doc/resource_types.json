@@ -1,0 +1,42 @@
+[
+  {
+    "resourceType": "applications",
+    "friendlyName": "application registration",
+    "urlValue": "applications"
+  },
+  {
+    "resourceType": "applications/federatedIdentityCredentials",
+    "friendlyName": "federated identity credentials associated with an application",
+    "urlValue": "applications/{application-id}/federatedIdentityCredentials"
+  },
+  {
+    "resourceType": "groups",
+    "friendlyName": "group",
+    "urlValue": "groups"
+  },
+  {
+    "resourceType": "groups/members",
+    "friendlyName": "group member",
+    "urlValue": "groups/{group-id}/members/$ref"
+  },
+  {
+    "resourceType": "oauth2PermissionGrants",
+    "friendlyName": "OAuth2 permission grant",
+    "urlValue": "oauth2PermissionGrants"
+  },
+  {
+    "resourceType": "servicePrincipals",
+    "friendlyName": "service principal",
+    "urlValue": "servicePrincipals"
+  },
+  {
+    "resourceType": "servicePrincipals/appRoleAssignments",
+    "friendlyName": "app role assignment associated with a service principal",
+    "urlValue": "servicePrincipals/{servicePrincipal-id}/appRoleAssignments"
+  },
+  {
+    "resourceType": "users",
+    "friendlyName": "user",
+    "urlValue": "users"
+  }
+]
