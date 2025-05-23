@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"reflect"
 	"strings"
 
@@ -322,21 +323,35 @@ func (r *MSGraphResource) Delete(ctx context.Context, req resource.DeleteRequest
 }
 
 func (r *MSGraphResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var id, url string
-	if strings.Contains(req.ID, "/$ref") {
-		reqIdWithoutRef := strings.ReplaceAll(req.ID, "/$ref", "")
-		id = reqIdWithoutRef[strings.LastIndex(reqIdWithoutRef, "/")+1:]
-		url = reqIdWithoutRef[0:strings.LastIndex(reqIdWithoutRef, "/")]
-		url = strings.TrimPrefix(url, "/")
-		url = fmt.Sprintf("%s/$ref", url)
+	var id, urlValue string
+	parsedUrl, err := url.Parse(req.ID)
+	if err != nil {
+		resp.Diagnostics.AddError("Failed to parse URL", err.Error())
+		return
+	}
+
+	apiVersion := "v1.0"
+	if parsedUrl.Query().Get("api-version") != "" {
+		apiVersion = parsedUrl.Query().Get("api-version")
+	}
+
+	if strings.HasSuffix(parsedUrl.Path, "/$ref") {
+		reqIdWithoutRef := strings.TrimSuffix(parsedUrl.Path, "/$ref")
+		lastIndex := strings.LastIndex(reqIdWithoutRef, "/")
+		id = reqIdWithoutRef[lastIndex+1:]
+		urlValue = reqIdWithoutRef[0:lastIndex]
+		urlValue = strings.TrimPrefix(urlValue, "/")
+		urlValue = fmt.Sprintf("%s/$ref", urlValue)
 	} else {
-		id = req.ID[strings.LastIndex(req.ID, "/")+1:]
-		url = strings.TrimPrefix(req.ID[0:strings.LastIndex(req.ID, "/")], "/")
+		lastIndex := strings.LastIndex(parsedUrl.Path, "/")
+		id = parsedUrl.Path[lastIndex+1:]
+		urlValue = strings.TrimPrefix(parsedUrl.Path[0:lastIndex], "/")
 	}
 
 	model := &MSGraphResourceModel{
 		Id:                    types.StringValue(id),
-		Url:                   types.StringValue(url),
+		Url:                   types.StringValue(urlValue),
+		ApiVersion:            types.StringValue(apiVersion),
 		CreateQueryParameters: types.MapNull(types.ListType{ElemType: types.StringType}),
 		UpdateQueryParameters: types.MapNull(types.ListType{ElemType: types.StringType}),
 		ReadQueryParameters:   types.MapNull(types.ListType{ElemType: types.StringType}),

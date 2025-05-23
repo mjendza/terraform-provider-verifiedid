@@ -93,6 +93,9 @@ For other arguments, please refer to the [msgraph_resource](https://registry.ter
 ## Import
 
  ```shell
- # Azure resource can be imported using the resource id, e.g.
+ # MSGraph resource can be imported using the resource id, e.g.
  terraform import msgraph_resource.example /oauth2PermissionGrants/{oauth2PermissionGrants-id}
+ 
+ # It also supports specifying API version by using the resource id with api-version as a query parameter, e.g.
+ terraform import msgraph_resource.example /oauth2PermissionGrants/{oauth2PermissionGrants-id}?api-version=v1.0
  ```
