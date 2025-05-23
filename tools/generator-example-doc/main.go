@@ -169,8 +169,14 @@ func GetImportResourceId(resourceType string) string {
 	}
 
 	out := fmt.Sprintf("/%s", v.UrlValue)
+
+	endsWithRef := strings.HasSuffix(out, "/$ref")
 	out = strings.TrimSuffix(out, "/$ref")
 	lastSegment := out[strings.LastIndex(out, "/")+1:]
 	out += fmt.Sprintf("/{%s-id}", lastSegment)
+
+	if endsWithRef {
+		out += "/$ref"
+	}
 	return out
 }
