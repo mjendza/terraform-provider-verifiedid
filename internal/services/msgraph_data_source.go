@@ -29,13 +29,13 @@ type MSGraphDataSource struct {
 
 // MSGraphDataSourceModel describes the data source data model.
 type MSGraphDataSourceModel struct {
-	Id                   types.String        `tfsdk:"id"`
-	ApiVersion           types.String        `tfsdk:"api_version"`
-	Url                  types.String        `tfsdk:"url"`
-	ResponseExportValues map[string]string   `tfsdk:"response_export_values"`
-	Headers              map[string]string   `tfsdk:"headers"`
-	QueryParameters      map[string][]string `tfsdk:"query_parameters"`
-	Output               types.Dynamic       `tfsdk:"output"`
+	Id                   types.String      `tfsdk:"id"`
+	ApiVersion           types.String      `tfsdk:"api_version"`
+	Url                  types.String      `tfsdk:"url"`
+	ResponseExportValues map[string]string `tfsdk:"response_export_values"`
+	Headers              types.Map         `tfsdk:"headers"`
+	QueryParameters      types.Map         `tfsdk:"query_parameters"`
+	Output               types.Dynamic     `tfsdk:"output"`
 }
 
 func (r *MSGraphDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -110,7 +110,9 @@ func (r *MSGraphDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	if model.ApiVersion.ValueString() != "" {
 		apiVersion = model.ApiVersion.ValueString()
 	}
-	responseBody, err := r.client.Read(ctx, model.Url.ValueString(), apiVersion, clients.NewRequestOptions(model.Headers, model.QueryParameters))
+
+	options := clients.NewRequestOptions(AsMapOfString(model.Headers), AsMapOfLists(model.QueryParameters))
+	responseBody, err := r.client.Read(ctx, model.Url.ValueString(), apiVersion, options)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to read data source", err.Error())
 		return

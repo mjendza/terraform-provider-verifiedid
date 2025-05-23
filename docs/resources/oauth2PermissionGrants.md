@@ -34,7 +34,10 @@ locals {
 }
 
 data "msgraph_resource" "servicePrincipal_msgraph" {
-  url = "servicePrincipals?$filter=appId eq '${local.MicrosoftGraphAppId}'"
+  url = "servicePrincipals"
+  query_parameters = {
+    "$filter" = ["appId eq '${local.MicrosoftGraphAppId}'"]
+  }
   response_export_values = {
     all = "@"
   }

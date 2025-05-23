@@ -66,6 +66,9 @@ This resource can manage any Microsoft Graph API resource.
 
 - `api_version` (String) The API version of the data source. The allowed values are `v1.0` and `beta`. Defaults to `v1.0`.
 - `body` (Dynamic) A dynamic attribute that contains the request body.
+- `create_query_parameters` (Map of List of String) A mapping of query parameters to be sent with the create request.
+- `delete_query_parameters` (Map of List of String) A mapping of query parameters to be sent with the delete request.
+- `read_query_parameters` (Map of List of String) A mapping of query parameters to be sent with the read request.
 - `response_export_values` (Map of String) A map where the key is the name for the result and the value is a JMESPath query string to filter the response. Here's an example. If it sets to `{"all" = "@", "app_id" = "appId"}`, it will set the following HCL object to the computed property output.
 
 	```text
@@ -81,6 +84,7 @@ This resource can manage any Microsoft Graph API resource.
 	```
 
 To learn more about JMESPath, visit [JMESPath](https://jmespath.org/).
+- `update_query_parameters` (Map of List of String) A mapping of query parameters to be sent with the update request.
 
 ### Read-Only
 
