@@ -5,9 +5,9 @@ The MSGraph provider is a very thin layer on top of the MSGraph REST APIs. Use t
 
 ## Get started with MSGraph
 
-* [MSGraph VSCode Extension](https://github.com/ms-henglu/msgraph-vscode) provides a rich authoring experience to help you use the MSGraph provider.
+* [Microsoft Terraform VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureterraform) provides a rich authoring experience to help you use the MSGraph provider.
 
-Also, there is a rich library of [examples](https://github.com/ms-henglu/terraform-provider-msgraph/tree/main/examples) to help you get started.
+Also, there is a rich library of [examples](https://github.com/Microsoft/terraform-provider-msgraph/tree/main/examples) to help you get started.
 
 ## Usage Example
 
@@ -72,11 +72,11 @@ You must run `Developing the Provider` commands in `bash` because `sh` scrips ar
 
 If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.18+ is **required**). You'll also need to correctly setup a [GOPATH](http://golang.org/doc/code.html#GOPATH), as well as adding `$GOPATH/bin` to your `$PATH`.
 
-First clone the repository to: `$GOPATH/src/github.com/ms-henglu/terraform-provider-msgraph`
+First clone the repository to: `$GOPATH/src/github.com/Microsoft/terraform-provider-msgraph`
 
 ```sh
 mkdir -p $GOPATH/src/github.com/Microsoft; cd $GOPATH/src/github.com/Microsoft
-git clone git@github.com:ms-henglu/terraform-provider-msgraph.git
+git clone git@github.com:Microsoft/terraform-provider-msgraph.git
 cd $GOPATH/src/github.com/Microsoft/terraform-provider-msgraph
 ```
 

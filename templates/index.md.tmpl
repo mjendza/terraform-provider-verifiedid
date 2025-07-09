@@ -11,11 +11,11 @@ The MSGraph provider is a very thin layer on top of the MSGraph REST APIs.
 
 Documentation regarding the [Data Sources](/docs/configuration/data-sources.html) and [Resources](/docs/configuration/resources.html) supported by the MSGraph Provider can be found in the navigation to the left.
 
-Interested in the provider's latest features, or want to make sure you're up to date? Check out the [changelog](https://github.com/ms-henglu/terraform-provider-msgraph/blob/main/CHANGELOG.md) for version information and release notes.
+Interested in the provider's latest features, or want to make sure you're up to date? Check out the [changelog](https://github.com/Microsoft/terraform-provider-msgraph/blob/main/CHANGELOG.md) for version information and release notes.
 
-Strongly recommended to install [MSGraph VSCode Extension](https://marketplace.visualstudio.com/items?itemName=azapi-vscode.msgraph), it provides a rich authoring experience to help you use the MSGraph provider.
+Strongly recommended to install [Microsoft Terraform VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureterraform), it provides a rich authoring experience to help you use the MSGraph provider.
 
-Also, there is a rich library of [examples](https://github.com/ms-henglu/terraform-provider-msgraph/tree/main/examples) to help you get started.
+Also, there is a rich library of [examples](https://github.com/Microsoft/terraform-provider-msgraph/tree/main/examples) to help you get started.
 
 ## Authenticating to MSGraph
 
