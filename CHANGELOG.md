@@ -3,6 +3,9 @@
 FEATURES:
 - **New Resource**: msgraph_update_resource
 
+ENHANCEMENTS:
+- `msgraph` resource and data source: support for `timeouts` configuration block
+
 BUG FIXES:
 - Fixed an issue with the `msgraph_resource` resource could not detect resource drift.
 
