@@ -24,6 +24,7 @@ import (
 	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
 	"github.com/microsoft/terraform-provider-msgraph/internal/docstrings"
 	"github.com/microsoft/terraform-provider-msgraph/internal/dynamic"
+	"github.com/microsoft/terraform-provider-msgraph/internal/retry"
 	"github.com/microsoft/terraform-provider-msgraph/internal/utils"
 )
 
@@ -59,6 +60,7 @@ type MSGraphResourceModel struct {
 	ReadQueryParameters   types.Map         `tfsdk:"read_query_parameters"`
 	DeleteQueryParameters types.Map         `tfsdk:"delete_query_parameters"`
 	ResponseExportValues  map[string]string `tfsdk:"response_export_values"`
+	Retry                 retry.Value       `tfsdk:"retry"`
 	Output                types.Dynamic     `tfsdk:"output"`
 	Timeouts              timeouts.Value    `tfsdk:"timeouts"`
 }
@@ -139,6 +141,8 @@ func (r *MSGraphResource) Schema(ctx context.Context, req resource.SchemaRequest
 				ElementType:         types.StringType,
 			},
 
+			"retry": retry.Schema(ctx),
+
 			"output": schema.DynamicAttribute{
 				MarkdownDescription: docstrings.Output(),
 				Computed:            true,
@@ -207,7 +211,10 @@ func (r *MSGraphResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	options := clients.NewRequestOptions(nil, AsMapOfLists(model.CreateQueryParameters))
+	options := clients.RequestOptions{
+		QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.CreateQueryParameters)),
+		RetryOptions:    clients.NewRetryOptions(model.Retry),
+	}
 	responseBody, err := r.client.Create(ctx, model.Url.ValueString(), model.ApiVersion.ValueString(), requestBody, options)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to create resource", err.Error())
@@ -236,7 +243,13 @@ func (r *MSGraphResource) Create(ctx context.Context, req resource.CreateRequest
 		}
 
 		model.Id = types.StringValue(responseId)
-		options = clients.NewRequestOptions(nil, AsMapOfLists(model.ReadQueryParameters))
+		options = clients.RequestOptions{
+			QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.ReadQueryParameters)),
+			RetryOptions: clients.CombineRetryOptions(
+				clients.NewRetryOptionsForReadAfterCreate(),
+				clients.NewRetryOptions(model.Retry),
+			),
+		}
 		responseBody, err = r.client.Read(ctx, fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString()), model.ApiVersion.ValueString(), options)
 		if err != nil {
 			resp.Diagnostics.AddError("Failed to read data source", err.Error())
@@ -271,14 +284,20 @@ func (r *MSGraphResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	options := clients.NewRequestOptions(nil, AsMapOfLists(model.UpdateQueryParameters))
+	options := clients.RequestOptions{
+		QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.UpdateQueryParameters)),
+		RetryOptions:    clients.NewRetryOptions(model.Retry),
+	}
 	_, err = r.client.Update(ctx, fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString()), model.ApiVersion.ValueString(), requestBody, options)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to create resource", err.Error())
 		return
 	}
 
-	options = clients.NewRequestOptions(nil, AsMapOfLists(model.ReadQueryParameters))
+	options = clients.RequestOptions{
+		QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.ReadQueryParameters)),
+		RetryOptions:    clients.NewRetryOptions(model.Retry),
+	}
 	responseBody, err := r.client.Read(ctx, fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString()), model.ApiVersion.ValueString(), options)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to read data source", err.Error())
@@ -305,7 +324,6 @@ func (r *MSGraphResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	state := model
-
 	if strings.HasSuffix(model.Url.ValueString(), "/$ref") {
 		state.Output = types.DynamicNull()
 		resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -375,7 +393,10 @@ func (r *MSGraphResource) Delete(ctx context.Context, req resource.DeleteRequest
 		itemUrl = fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString())
 	}
 
-	options := clients.NewRequestOptions(nil, AsMapOfLists(model.DeleteQueryParameters))
+	options := clients.RequestOptions{
+		QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.DeleteQueryParameters)),
+		RetryOptions:    clients.NewRetryOptions(model.Retry),
+	}
 	err := r.client.Delete(ctx, itemUrl, model.ApiVersion.ValueString(), options)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to delete resource", err.Error())
@@ -417,6 +438,7 @@ func (r *MSGraphResource) ImportState(ctx context.Context, req resource.ImportSt
 		UpdateQueryParameters: types.MapNull(types.ListType{ElemType: types.StringType}),
 		ReadQueryParameters:   types.MapNull(types.ListType{ElemType: types.StringType}),
 		DeleteQueryParameters: types.MapNull(types.ListType{ElemType: types.StringType}),
+		Retry:                 retry.NewValueNull(),
 		Timeouts: timeouts.Value{
 			Object: types.ObjectNull(map[string]attr.Type{
 				"create": types.StringType,
