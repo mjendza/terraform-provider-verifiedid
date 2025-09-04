@@ -70,7 +70,7 @@ func TestAcc_ResourceGroupMember(t *testing.T) {
 	importStep.ImportStateVerify = false
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
-			Config: r.groupMember(data),
+			Config: r.groupMember(),
 			Check: resource.ComposeTestCheckFunc(
 				check.That(data.ResourceName).Exists(r),
 				check.That(data.ResourceName).Key("id").IsUUID(),
@@ -88,7 +88,35 @@ func TestAcc_ResourceIgnoreMissingProperty(t *testing.T) {
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
-			Config: r.groupOwnerBind(data),
+			Config: r.groupOwnerBind("My Group Owners Bind"),
+			Check: resource.ComposeTestCheckFunc(
+				check.That(data.ResourceName).Exists(r),
+				check.That(data.ResourceName).Key("id").IsUUID(),
+			),
+		},
+		data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...),
+	})
+}
+
+func TestAcc_ResourceGroupOwnerBind_UpdateDisplayName(t *testing.T) {
+	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+
+	r := MSGraphTestResource{}
+
+	importStep := data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...)
+	importStep.ImportStateVerify = false
+
+	data.ResourceTest(t, r, []resource.TestStep{
+		{
+			Config: r.groupOwnerBind("My Group Owners Bind"),
+			Check: resource.ComposeTestCheckFunc(
+				check.That(data.ResourceName).Exists(r),
+				check.That(data.ResourceName).Key("id").IsUUID(),
+			),
+		},
+		data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...),
+		{
+			Config: r.groupOwnerBind("My Group Owners Bind Updated"),
 			Check: resource.ComposeTestCheckFunc(
 				check.That(data.ResourceName).Exists(r),
 				check.That(data.ResourceName).Key("id").IsUUID(),
@@ -105,7 +133,7 @@ func TestAcc_ResourceRetry(t *testing.T) {
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
-			Config: r.withRetry(data),
+			Config: r.withRetry(),
 			Check: resource.ComposeTestCheckFunc(
 				check.That(data.ResourceName).Exists(r),
 				check.That(data.ResourceName).Key("id").IsUUID(),
@@ -202,7 +230,7 @@ resource "msgraph_resource" "test" {
 `
 }
 
-func (r MSGraphTestResource) groupMember(data acceptance.TestData) string {
+func (r MSGraphTestResource) groupMember() string {
 	return `
 resource "msgraph_resource" "application" {
   url = "applications"
@@ -240,8 +268,8 @@ resource "msgraph_resource" "test" {
 `
 }
 
-func (r MSGraphTestResource) groupOwnerBind(data acceptance.TestData) string {
-	return `
+func (r MSGraphTestResource) groupOwnerBind(displayName string) string {
+	return fmt.Sprintf(`
 resource "msgraph_resource" "application" {
   url = "applications"
   body = {
@@ -262,7 +290,7 @@ resource "msgraph_resource" "servicePrincipal_application" {
 resource "msgraph_resource" "test" {
   url = "groups"
   body = {
-    displayName     = "My Group Owners Bind"
+    displayName     = "%s"
     mailEnabled     = false
     mailNickname    = "mygroup-owners-bind"
     securityEnabled = true
@@ -271,10 +299,10 @@ resource "msgraph_resource" "test" {
     ]
   }
 }
-`
+`, displayName)
 }
 
-func (r MSGraphTestResource) withRetry(data acceptance.TestData) string {
+func (r MSGraphTestResource) withRetry() string {
 	return `
 resource "msgraph_resource" "test" {
   url = "applications"
