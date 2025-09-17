@@ -1,4 +1,4 @@
-module github.com/microsoft/terraform-provider-verifiedid
+module github.com/mjendza/terraform-provider-verifiedid
 
 go 1.23.0
 

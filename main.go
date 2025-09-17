@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/microsoft/verifiedid",
+		Address: "registry.terraform.io/mjendza/verifiedid",
 		Debug:   debug,
 	}
 
