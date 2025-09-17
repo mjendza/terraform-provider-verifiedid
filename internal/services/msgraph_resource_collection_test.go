@@ -14,11 +14,11 @@ import (
 	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
-type MSGraphTestResourceCollection struct{}
+type VerifiedIDTestResourceCollection struct{}
 
 func TestAcc_ResourceCollectionBasic(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_collection", "test")
-	r := MSGraphTestResourceCollection{}
+	data := acceptance.BuildTestData(t, "verifiedid_resource_collection", "test")
+	r := VerifiedIDTestResourceCollection{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -34,8 +34,8 @@ func TestAcc_ResourceCollectionBasic(t *testing.T) {
 }
 
 func TestAcc_ResourceCollectionUpdate(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_collection", "test")
-	r := MSGraphTestResourceCollection{}
+	data := acceptance.BuildTestData(t, "verifiedid_resource_collection", "test")
+	r := VerifiedIDTestResourceCollection{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -66,8 +66,8 @@ func TestAcc_ResourceCollectionUpdate(t *testing.T) {
 }
 
 func TestAcc_ResourceCollectionRetry(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_collection", "test")
-	r := MSGraphTestResourceCollection{}
+	data := acceptance.BuildTestData(t, "verifiedid_resource_collection", "test")
+	r := VerifiedIDTestResourceCollection{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -81,8 +81,8 @@ func TestAcc_ResourceCollectionRetry(t *testing.T) {
 }
 
 func TestAcc_ResourceCollectionReadQueryParameters(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_collection", "test")
-	r := MSGraphTestResourceCollection{}
+	data := acceptance.BuildTestData(t, "verifiedid_resource_collection", "test")
+	r := VerifiedIDTestResourceCollection{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -97,8 +97,8 @@ func TestAcc_ResourceCollectionReadQueryParameters(t *testing.T) {
 }
 
 func TestAcc_ResourceCollectionTimeouts_Create(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_collection", "test")
-	r := MSGraphTestResourceCollection{}
+	data := acceptance.BuildTestData(t, "verifiedid_resource_collection", "test")
+	r := VerifiedIDTestResourceCollection{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -109,8 +109,8 @@ func TestAcc_ResourceCollectionTimeouts_Create(t *testing.T) {
 }
 
 func TestAcc_ResourceCollectionTimeouts_Update(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_collection", "test")
-	r := MSGraphTestResourceCollection{}
+	data := acceptance.BuildTestData(t, "verifiedid_resource_collection", "test")
+	r := VerifiedIDTestResourceCollection{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -128,8 +128,8 @@ func TestAcc_ResourceCollectionTimeouts_Update(t *testing.T) {
 }
 
 func TestAcc_ResourceCollectionTimeouts_Read(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_collection", "test")
-	r := MSGraphTestResourceCollection{}
+	data := acceptance.BuildTestData(t, "verifiedid_resource_collection", "test")
+	r := VerifiedIDTestResourceCollection{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -140,11 +140,11 @@ func TestAcc_ResourceCollectionTimeouts_Read(t *testing.T) {
 }
 
 // Exists checks that the underlying collection endpoint exists by listing it.
-func (r MSGraphTestResourceCollection) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
+func (r VerifiedIDTestResourceCollection) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
 	apiVersion := state.Attributes["api_version"]
 	id := state.Attributes["id"] // base collection URL
 
-	_, err := client.MSGraphClient.List(ctx, id, apiVersion, clients.DefaultRequestOptions())
+	_, err := client.VerifiedIDClient.List(ctx, id, apiVersion, clients.DefaultRequestOptions())
 	if err == nil {
 		b := true
 		return &b, nil
@@ -157,9 +157,9 @@ func (r MSGraphTestResourceCollection) Exists(ctx context.Context, client *clien
 }
 
 // configuration helpers
-func (r MSGraphTestResourceCollection) basic() string {
+func (r VerifiedIDTestResourceCollection) basic() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -169,14 +169,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -186,17 +186,17 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url           = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url           = "groups/${verifiedid_resource.group.id}/members/$ref"
   api_version   = "beta"
-  reference_ids = [msgraph_resource.sp_a.id]
+  reference_ids = [verifiedid_resource.sp_a.id]
 }
 `
 }
 
-func (r MSGraphTestResourceCollection) basicWithReadQueryParameters() string {
+func (r VerifiedIDTestResourceCollection) basicWithReadQueryParameters() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -206,14 +206,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -223,10 +223,10 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url           = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url           = "groups/${verifiedid_resource.group.id}/members/$ref"
   api_version   = "beta"
-  reference_ids = [msgraph_resource.sp_a.id]
+  reference_ids = [verifiedid_resource.sp_a.id]
   read_query_parameters = {
     "$select" = ["id"]
   }
@@ -234,9 +234,9 @@ resource "msgraph_resource_collection" "test" {
 `
 }
 
-func (r MSGraphTestResourceCollection) updateOneMember() string {
+func (r VerifiedIDTestResourceCollection) updateOneMember() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -246,14 +246,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "application_b" {
+resource "verifiedid_resource" "application_b" {
   url = "applications"
   body = {
     displayName = "Collection App b"
@@ -263,14 +263,14 @@ resource "msgraph_resource" "application_b" {
   }
 }
 
-resource "msgraph_resource" "sp_b" {
+resource "verifiedid_resource" "sp_b" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_b.output.appId
+    appId = verifiedid_resource.application_b.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -280,17 +280,17 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url           = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url           = "groups/${verifiedid_resource.group.id}/members/$ref"
   api_version   = "beta"
-  reference_ids = [msgraph_resource.sp_a.id]
+  reference_ids = [verifiedid_resource.sp_a.id]
 }
 `
 }
 
-func (r MSGraphTestResourceCollection) updateTwoMembers() string {
+func (r VerifiedIDTestResourceCollection) updateTwoMembers() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -300,14 +300,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "application_b" {
+resource "verifiedid_resource" "application_b" {
   url = "applications"
   body = {
     displayName = "Collection App b"
@@ -317,14 +317,14 @@ resource "msgraph_resource" "application_b" {
   }
 }
 
-resource "msgraph_resource" "sp_b" {
+resource "verifiedid_resource" "sp_b" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_b.output.appId
+    appId = verifiedid_resource.application_b.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -334,20 +334,20 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url         = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url         = "groups/${verifiedid_resource.group.id}/members/$ref"
   api_version = "beta"
   reference_ids = [
-    msgraph_resource.sp_a.id,
-    msgraph_resource.sp_b.id,
+    verifiedid_resource.sp_a.id,
+    verifiedid_resource.sp_b.id,
   ]
 }
 `
 }
 
-func (r MSGraphTestResourceCollection) withRetry() string {
+func (r VerifiedIDTestResourceCollection) withRetry() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -357,14 +357,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -374,10 +374,10 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url           = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url           = "groups/${verifiedid_resource.group.id}/members/$ref"
   api_version   = "beta"
-  reference_ids = [msgraph_resource.sp_a.id]
+  reference_ids = [verifiedid_resource.sp_a.id]
   retry = {
     error_message_regex = [
       ".*throttl.*",
@@ -388,9 +388,9 @@ resource "msgraph_resource_collection" "test" {
 `
 }
 
-func (r MSGraphTestResourceCollection) withCreateTimeout() string {
+func (r VerifiedIDTestResourceCollection) withCreateTimeout() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -400,14 +400,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -417,20 +417,20 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url = "groups/${verifiedid_resource.group.id}/members/$ref"
   timeouts {
     create = "1ns"
   }
   api_version   = "beta"
-  reference_ids = [msgraph_resource.sp_a.id]
+  reference_ids = [verifiedid_resource.sp_a.id]
 }
 `
 }
 
-func (r MSGraphTestResourceCollection) withUpdateTimeoutTwoMembers() string {
+func (r VerifiedIDTestResourceCollection) withUpdateTimeoutTwoMembers() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -440,14 +440,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "application_b" {
+resource "verifiedid_resource" "application_b" {
   url = "applications"
   body = {
     displayName = "Collection App b"
@@ -457,14 +457,14 @@ resource "msgraph_resource" "application_b" {
   }
 }
 
-resource "msgraph_resource" "sp_b" {
+resource "verifiedid_resource" "sp_b" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_b.output.appId
+    appId = verifiedid_resource.application_b.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -474,23 +474,23 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url = "groups/${verifiedid_resource.group.id}/members/$ref"
   timeouts {
     update = "1ns"
   }
   api_version = "beta"
   reference_ids = [
-    msgraph_resource.sp_a.id,
-    msgraph_resource.sp_b.id,
+    verifiedid_resource.sp_a.id,
+    verifiedid_resource.sp_b.id,
   ]
 }
 `
 }
 
-func (r MSGraphTestResourceCollection) withReadTimeoutOneMember() string {
+func (r VerifiedIDTestResourceCollection) withReadTimeoutOneMember() string {
 	return `
-resource "msgraph_resource" "application_a" {
+resource "verifiedid_resource" "application_a" {
   url = "applications"
   body = {
     displayName = "Collection App a"
@@ -500,14 +500,14 @@ resource "msgraph_resource" "application_a" {
   }
 }
 
-resource "msgraph_resource" "sp_a" {
+resource "verifiedid_resource" "sp_a" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application_a.output.appId
+    appId = verifiedid_resource.application_a.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Collection Group"
@@ -517,13 +517,13 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_collection" "test" {
-  url = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource_collection" "test" {
+  url = "groups/${verifiedid_resource.group.id}/members/$ref"
   timeouts {
     read = "1ns"
   }
   api_version   = "beta"
-  reference_ids = [msgraph_resource.sp_a.id]
+  reference_ids = [verifiedid_resource.sp_a.id]
 }
 `
 }

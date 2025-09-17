@@ -16,19 +16,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ datasource.DataSource = &MSGraphDataSource{}
+var _ datasource.DataSource = &VerifiedIDDataSource{}
 
-func NewMSGraphDataSource() datasource.DataSource {
-	return &MSGraphDataSource{}
+func NewVerifiedIDDataSource() datasource.DataSource {
+	return &VerifiedIDDataSource{}
 }
 
-// MSGraphDataSource defines the data source implementation.
-type MSGraphDataSource struct {
-	client *clients.MSGraphClient
+// VerifiedIDDataSource defines the data source implementation.
+type VerifiedIDDataSource struct {
+	client *clients.VerifiedIDClient
 }
 
-// MSGraphDataSourceModel describes the data source data model.
-type MSGraphDataSourceModel struct {
+// VerifiedIDDataSourceModel describes the data source data model.
+type VerifiedIDDataSourceModel struct {
 	Id                   types.String      `tfsdk:"id"`
 	ApiVersion           types.String      `tfsdk:"api_version"`
 	Url                  types.String      `tfsdk:"url"`
@@ -40,11 +40,11 @@ type MSGraphDataSourceModel struct {
 	Timeouts             timeouts.Value    `tfsdk:"timeouts"`
 }
 
-func (r *MSGraphDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (r *VerifiedIDDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_resource"
 }
 
-func (r *MSGraphDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (r *VerifiedIDDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "This data source can list resources or read an individual resource from the Microsoft Graph API.",
@@ -104,14 +104,14 @@ func (r *MSGraphDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 	}
 }
 
-func (r *MSGraphDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (r *VerifiedIDDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if v, ok := req.ProviderData.(*clients.Client); ok {
-		r.client = v.MSGraphClient
+		r.client = v.VerifiedIDClient
 	}
 }
 
-func (r *MSGraphDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var model MSGraphDataSourceModel
+func (r *VerifiedIDDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var model VerifiedIDDataSourceModel
 	if resp.Diagnostics.Append(req.Config.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}

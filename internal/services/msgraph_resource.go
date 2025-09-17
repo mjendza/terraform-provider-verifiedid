@@ -31,27 +31,27 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var (
-	_ resource.Resource                     = &MSGraphResource{}
-	_ resource.ResourceWithImportState      = &MSGraphResource{}
-	_ resource.ResourceWithConfigValidators = &MSGraphResource{}
-	_ resource.ResourceWithModifyPlan       = &MSGraphResource{}
+	_ resource.Resource                     = &VerifiedIDResource{}
+	_ resource.ResourceWithImportState      = &VerifiedIDResource{}
+	_ resource.ResourceWithConfigValidators = &VerifiedIDResource{}
+	_ resource.ResourceWithModifyPlan       = &VerifiedIDResource{}
 )
 
-func NewMSGraphResource() resource.Resource {
-	return &MSGraphResource{}
+func NewVerifiedIDResource() resource.Resource {
+	return &VerifiedIDResource{}
 }
 
-// MSGraphResource defines the resource implementation.
-type MSGraphResource struct {
-	client *clients.MSGraphClient
+// VerifiedIDResource defines the resource implementation.
+type VerifiedIDResource struct {
+	client *clients.VerifiedIDClient
 }
 
-func (r *MSGraphResource) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
+func (r *VerifiedIDResource) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{}
 }
 
-// MSGraphResourceModel describes the resource data model.
-type MSGraphResourceModel struct {
+// VerifiedIDResourceModel describes the resource data model.
+type VerifiedIDResourceModel struct {
 	Id                    types.String      `tfsdk:"id"`
 	ResourceUrl           types.String      `tfsdk:"resource_url"`
 	ApiVersion            types.String      `tfsdk:"api_version"`
@@ -68,11 +68,11 @@ type MSGraphResourceModel struct {
 	Timeouts              timeouts.Value    `tfsdk:"timeouts"`
 }
 
-func (r *MSGraphResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *VerifiedIDResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_resource"
 }
 
-func (r *MSGraphResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *VerifiedIDResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "This resource can manage any Microsoft Graph API resource.",
@@ -173,19 +173,19 @@ func (r *MSGraphResource) Schema(ctx context.Context, req resource.SchemaRequest
 	}
 }
 
-func (r *MSGraphResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *VerifiedIDResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if v, ok := req.ProviderData.(*clients.Client); ok {
-		r.client = v.MSGraphClient
+		r.client = v.VerifiedIDClient
 	}
 }
 
-func (r *MSGraphResource) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
-	var plan *MSGraphResourceModel
+func (r *VerifiedIDResource) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
+	var plan *VerifiedIDResourceModel
 	if response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...); response.Diagnostics.HasError() {
 		return
 	}
 
-	var state *MSGraphResourceModel
+	var state *VerifiedIDResourceModel
 	if response.Diagnostics.Append(request.State.Get(ctx, &state)...); response.Diagnostics.HasError() {
 		return
 	}
@@ -207,8 +207,8 @@ func (r *MSGraphResource) ModifyPlan(ctx context.Context, request resource.Modif
 	}
 }
 
-func (r *MSGraphResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var model *MSGraphResourceModel
+func (r *VerifiedIDResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var model *VerifiedIDResourceModel
 	if resp.Diagnostics.Append(req.Plan.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -279,8 +279,8 @@ func (r *MSGraphResource) Create(ctx context.Context, req resource.CreateRequest
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 }
 
-func (r *MSGraphResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var model, state *MSGraphResourceModel
+func (r *VerifiedIDResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var model, state *VerifiedIDResourceModel
 	if resp.Diagnostics.Append(req.Plan.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -339,8 +339,8 @@ func (r *MSGraphResource) Update(ctx context.Context, req resource.UpdateRequest
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 }
 
-func (r *MSGraphResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var model *MSGraphResourceModel
+func (r *VerifiedIDResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var model *VerifiedIDResourceModel
 	if resp.Diagnostics.Append(req.State.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -407,8 +407,8 @@ func (r *MSGraphResource) Read(ctx context.Context, req resource.ReadRequest, re
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
-func (r *MSGraphResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var model *MSGraphResourceModel
+func (r *VerifiedIDResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var model *VerifiedIDResourceModel
 	if resp.Diagnostics.Append(req.State.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -436,7 +436,7 @@ func (r *MSGraphResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 }
 
-func (r *MSGraphResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *VerifiedIDResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	var id, urlValue string
 	parsedUrl, err := url.Parse(req.ID)
 	if err != nil {
@@ -473,7 +473,7 @@ func (r *MSGraphResource) ImportState(ctx context.Context, req resource.ImportSt
 		resourceUrl = fmt.Sprintf("%s/%s", urlValue, id)
 	}
 
-	model := &MSGraphResourceModel{
+	model := &VerifiedIDResourceModel{
 		Id:                    types.StringValue(id),
 		ResourceUrl:           types.StringValue(resourceUrl),
 		Url:                   types.StringValue(urlValue),

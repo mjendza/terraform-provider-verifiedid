@@ -19,19 +19,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ datasource.DataSource = &MSGraphResourceActionDataSource{}
+var _ datasource.DataSource = &VerifiedIDResourceActionDataSource{}
 
-func NewMSGraphResourceActionDataSource() datasource.DataSource {
-	return &MSGraphResourceActionDataSource{}
+func NewVerifiedIDResourceActionDataSource() datasource.DataSource {
+	return &VerifiedIDResourceActionDataSource{}
 }
 
-// MSGraphResourceActionDataSource defines the data source implementation.
-type MSGraphResourceActionDataSource struct {
-	client *clients.MSGraphClient
+// VerifiedIDResourceActionDataSource defines the data source implementation.
+type VerifiedIDResourceActionDataSource struct {
+	client *clients.VerifiedIDClient
 }
 
-// MSGraphResourceActionDataSourceModel describes the data source data model.
-type MSGraphResourceActionDataSourceModel struct {
+// VerifiedIDResourceActionDataSourceModel describes the data source data model.
+type VerifiedIDResourceActionDataSourceModel struct {
 	Id                   types.String      `tfsdk:"id"`
 	ApiVersion           types.String      `tfsdk:"api_version"`
 	ResourceUrl          types.String      `tfsdk:"resource_url"`
@@ -46,11 +46,11 @@ type MSGraphResourceActionDataSourceModel struct {
 	Timeouts             timeouts.Value    `tfsdk:"timeouts"`
 }
 
-func (r *MSGraphResourceActionDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (r *VerifiedIDResourceActionDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_resource_action"
 }
 
-func (r *MSGraphResourceActionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (r *VerifiedIDResourceActionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "This data source can perform any Microsoft Graph API action and return the result. Use this for read-only operations like retrieving calculated values, checking status, or performing queries.",
@@ -62,7 +62,7 @@ func (r *MSGraphResourceActionDataSource) Schema(ctx context.Context, req dataso
 			},
 
 			"resource_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of the resource to perform the action on. This should be the full resource path, for example `applications/12345678-1234-1234-1234-123456789abc` or `users/user@example.com`. You can use the `resource_url` output from `msgraph_resource`.",
+				MarkdownDescription: "The URL of the resource to perform the action on. This should be the full resource path, for example `applications/12345678-1234-1234-1234-123456789abc` or `users/user@example.com`. You can use the `resource_url` output from `verifiedid_resource`.",
 				Required:            true,
 			},
 
@@ -128,14 +128,14 @@ func (r *MSGraphResourceActionDataSource) Schema(ctx context.Context, req dataso
 	}
 }
 
-func (r *MSGraphResourceActionDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (r *VerifiedIDResourceActionDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if v, ok := req.ProviderData.(*clients.Client); ok {
-		r.client = v.MSGraphClient
+		r.client = v.VerifiedIDClient
 	}
 }
 
-func (r *MSGraphResourceActionDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var model *MSGraphResourceActionDataSourceModel
+func (r *VerifiedIDResourceActionDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var model *VerifiedIDResourceActionDataSourceModel
 	if resp.Diagnostics.Append(req.Config.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}

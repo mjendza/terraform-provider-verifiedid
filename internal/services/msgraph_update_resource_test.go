@@ -14,12 +14,12 @@ import (
 	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
-type MSGraphTestUpdateResource struct{}
+type VerifiedIDTestUpdateResource struct{}
 
 func TestAcc_UpdateResourceBasic(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_update_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
 
-	r := MSGraphTestUpdateResource{}
+	r := VerifiedIDTestUpdateResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -33,9 +33,9 @@ func TestAcc_UpdateResourceBasic(t *testing.T) {
 }
 
 func TestAcc_UpdateResourceUpdate(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_update_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
 
-	r := MSGraphTestUpdateResource{}
+	r := VerifiedIDTestUpdateResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -54,8 +54,8 @@ func TestAcc_UpdateResourceUpdate(t *testing.T) {
 }
 
 func TestAcc_UpdateResourceTimeouts_Update(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_update_resource", "test")
-	r := MSGraphTestUpdateResource{}
+	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
+	r := VerifiedIDTestUpdateResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -69,8 +69,8 @@ func TestAcc_UpdateResourceTimeouts_Update(t *testing.T) {
 }
 
 func TestAcc_UpdateResourceTimeouts_Create(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_update_resource", "test")
-	r := MSGraphTestUpdateResource{}
+	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
+	r := VerifiedIDTestUpdateResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -81,8 +81,8 @@ func TestAcc_UpdateResourceTimeouts_Create(t *testing.T) {
 }
 
 func TestAcc_UpdateResourceTimeouts_Read(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_update_resource", "test")
-	r := MSGraphTestUpdateResource{}
+	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
+	r := VerifiedIDTestUpdateResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -93,9 +93,9 @@ func TestAcc_UpdateResourceTimeouts_Read(t *testing.T) {
 }
 
 func TestAcc_UpdateResourceRetry(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_update_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
 
-	r := MSGraphTestUpdateResource{}
+	r := VerifiedIDTestUpdateResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -108,8 +108,8 @@ func TestAcc_UpdateResourceRetry(t *testing.T) {
 }
 
 func TestAcc_UpdateResource_GroupOwnerBind_UpdateDisplayName(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_update_resource", "test")
-	r := MSGraphTestUpdateResource{}
+	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
+	r := VerifiedIDTestUpdateResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -127,11 +127,11 @@ func TestAcc_UpdateResource_GroupOwnerBind_UpdateDisplayName(t *testing.T) {
 	})
 }
 
-func (r MSGraphTestUpdateResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
+func (r VerifiedIDTestUpdateResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
 	apiVersion := state.Attributes["api_version"]
 	url := state.Attributes["url"]
 
-	_, err := client.MSGraphClient.Read(ctx, url, apiVersion, clients.DefaultRequestOptions())
+	_, err := client.VerifiedIDClient.Read(ctx, url, apiVersion, clients.DefaultRequestOptions())
 	if err == nil {
 		b := true
 		return &b, nil
@@ -143,9 +143,9 @@ func (r MSGraphTestUpdateResource) Exists(ctx context.Context, client *clients.C
 	return nil, fmt.Errorf("checking for presence of existing %s(api_version=%s) resource: %w", state.ID, apiVersion, err)
 }
 
-func (r MSGraphTestUpdateResource) basic(displayName string) string {
+func (r VerifiedIDTestUpdateResource) basic(displayName string) string {
 	return fmt.Sprintf(`
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "Demo App"
@@ -156,8 +156,8 @@ resource "msgraph_resource" "application" {
   }
 }
 
-resource "msgraph_update_resource" "test" {
-  url = "applications/${msgraph_resource.application.id}"
+resource "verifiedid_update_resource" "test" {
+  url = "applications/${verifiedid_resource.application.id}"
   body = {
     displayName = "%s"
   }
@@ -165,12 +165,12 @@ resource "msgraph_update_resource" "test" {
 `, displayName)
 }
 
-func (r MSGraphTestUpdateResource) withUpdateTimeout(displayName string) string {
+func (r VerifiedIDTestUpdateResource) withUpdateTimeout(displayName string) string {
 	return fmt.Sprintf(`
 %s
 
-resource "msgraph_update_resource" "test" {
-  url = "applications/${msgraph_resource.application.id}"
+resource "verifiedid_update_resource" "test" {
+  url = "applications/${verifiedid_resource.application.id}"
   body = {
     displayName = "%s"
   }
@@ -178,15 +178,15 @@ resource "msgraph_update_resource" "test" {
     update = "1ns"
   }
 }
-`, MSGraphTestUpdateResource{}.applicationOnly(), displayName)
+`, VerifiedIDTestUpdateResource{}.applicationOnly(), displayName)
 }
 
-func (r MSGraphTestUpdateResource) withReadTimeout(displayName string) string {
+func (r VerifiedIDTestUpdateResource) withReadTimeout(displayName string) string {
 	return fmt.Sprintf(`
 %s
 
-resource "msgraph_update_resource" "test" {
-  url = "applications/${msgraph_resource.application.id}"
+resource "verifiedid_update_resource" "test" {
+  url = "applications/${verifiedid_resource.application.id}"
   body = {
     displayName = "%s"
   }
@@ -194,15 +194,15 @@ resource "msgraph_update_resource" "test" {
     read = "1ns"
   }
 }
-`, MSGraphTestUpdateResource{}.applicationOnly(), displayName)
+`, VerifiedIDTestUpdateResource{}.applicationOnly(), displayName)
 }
 
-func (r MSGraphTestUpdateResource) withCreateTimeout(displayName string) string {
+func (r VerifiedIDTestUpdateResource) withCreateTimeout(displayName string) string {
 	return fmt.Sprintf(`
 %s
 
-resource "msgraph_update_resource" "test" {
-  url = "applications/${msgraph_resource.application.id}"
+resource "verifiedid_update_resource" "test" {
+  url = "applications/${verifiedid_resource.application.id}"
   body = {
     displayName = "%s"
   }
@@ -210,14 +210,14 @@ resource "msgraph_update_resource" "test" {
     create = "1ns"
   }
 }
-`, MSGraphTestUpdateResource{}.applicationOnly(), displayName)
+`, VerifiedIDTestUpdateResource{}.applicationOnly(), displayName)
 }
 
 // applicationOnly returns just the application resource to be used for composing
 // different update resource configurations.
-func (r MSGraphTestUpdateResource) applicationOnly() string {
+func (r VerifiedIDTestUpdateResource) applicationOnly() string {
 	return `
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "Demo App"
@@ -230,9 +230,9 @@ resource "msgraph_resource" "application" {
 `
 }
 
-func (r MSGraphTestUpdateResource) withRetry() string {
+func (r VerifiedIDTestUpdateResource) withRetry() string {
 	return `
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "Demo App"
@@ -243,8 +243,8 @@ resource "msgraph_resource" "application" {
   }
 }
 
-resource "msgraph_update_resource" "test" {
-  url = "applications/${msgraph_resource.application.id}"
+resource "verifiedid_update_resource" "test" {
+  url = "applications/${verifiedid_resource.application.id}"
   body = {
     displayName = "Demo App Updated With Retry"
   }
@@ -258,9 +258,9 @@ resource "msgraph_update_resource" "test" {
 `
 }
 
-func (r MSGraphTestUpdateResource) groupWithOwnerBase() string {
+func (r VerifiedIDTestUpdateResource) groupWithOwnerBase() string {
 	return `
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "My Application"
@@ -270,14 +270,14 @@ resource "msgraph_resource" "application" {
   }
 }
 
-resource "msgraph_resource" "servicePrincipal_application" {
+resource "verifiedid_resource" "servicePrincipal_application" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application.output.appId
+    appId = verifiedid_resource.application.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "My Group Owners Bind"
@@ -285,7 +285,7 @@ resource "msgraph_resource" "group" {
     mailNickname    = "mygroup-owners-bind"
     securityEnabled = true
     "owners@odata.bind" = [
-      "https://graph.microsoft.com/v1.0/directoryObjects/${msgraph_resource.servicePrincipal_application.id}"
+      "https://graph.microsoft.com/v1.0/directoryObjects/${verifiedid_resource.servicePrincipal_application.id}"
     ]
   }
   lifecycle {
@@ -295,12 +295,12 @@ resource "msgraph_resource" "group" {
 `
 }
 
-func (r MSGraphTestUpdateResource) groupWithOwnerUpdate(displayName string) string {
+func (r VerifiedIDTestUpdateResource) groupWithOwnerUpdate(displayName string) string {
 	return fmt.Sprintf(`
 %s
 
-resource "msgraph_update_resource" "test" {
-  url = "groups/${msgraph_resource.group.id}"
+resource "verifiedid_update_resource" "test" {
+  url = "groups/${verifiedid_resource.group.id}"
   body = {
     displayName = "%s"
   }

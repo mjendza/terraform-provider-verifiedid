@@ -23,21 +23,21 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var (
-	_ resource.Resource               = &MSGraphResourceAction{}
-	_ resource.ResourceWithModifyPlan = &MSGraphResourceAction{}
+	_ resource.Resource               = &VerifiedIDResourceAction{}
+	_ resource.ResourceWithModifyPlan = &VerifiedIDResourceAction{}
 )
 
-func NewMSGraphResourceAction() resource.Resource {
-	return &MSGraphResourceAction{}
+func NewVerifiedIDResourceAction() resource.Resource {
+	return &VerifiedIDResourceAction{}
 }
 
-// MSGraphResourceAction defines the resource implementation.
-type MSGraphResourceAction struct {
-	client *clients.MSGraphClient
+// VerifiedIDResourceAction defines the resource implementation.
+type VerifiedIDResourceAction struct {
+	client *clients.VerifiedIDClient
 }
 
-// MSGraphResourceActionModel describes the resource data model.
-type MSGraphResourceActionModel struct {
+// VerifiedIDResourceActionModel describes the resource data model.
+type VerifiedIDResourceActionModel struct {
 	Id                   types.String      `tfsdk:"id"`
 	ApiVersion           types.String      `tfsdk:"api_version"`
 	ResourceUrl          types.String      `tfsdk:"resource_url"`
@@ -52,11 +52,11 @@ type MSGraphResourceActionModel struct {
 	Timeouts             timeouts.Value    `tfsdk:"timeouts"`
 }
 
-func (r *MSGraphResourceAction) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *VerifiedIDResourceAction) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_resource_action"
 }
 
-func (r *MSGraphResourceAction) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *VerifiedIDResourceAction) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "This resource can perform any Microsoft Graph API action. Use this for operations like password resets, sending emails, or other one-time actions.",
@@ -71,7 +71,7 @@ func (r *MSGraphResourceAction) Schema(ctx context.Context, req resource.SchemaR
 			},
 
 			"resource_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of the resource to perform the action on. This should be the full resource path, for example `applications/12345678-1234-1234-1234-123456789abc` or `users/user@example.com`. You can use the `resource_url` output from `msgraph_resource`.",
+				MarkdownDescription: "The URL of the resource to perform the action on. This should be the full resource path, for example `applications/12345678-1234-1234-1234-123456789abc` or `users/user@example.com`. You can use the `resource_url` output from `verifiedid_resource`.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -151,26 +151,26 @@ func (r *MSGraphResourceAction) Schema(ctx context.Context, req resource.SchemaR
 	}
 }
 
-func (r *MSGraphResourceAction) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *VerifiedIDResourceAction) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if v, ok := req.ProviderData.(*clients.Client); ok {
-		r.client = v.MSGraphClient
+		r.client = v.VerifiedIDClient
 	}
 }
 
-func (r *MSGraphResourceAction) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
-	var plan *MSGraphResourceActionModel
+func (r *VerifiedIDResourceAction) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
+	var plan *VerifiedIDResourceActionModel
 	if response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...); response.Diagnostics.HasError() {
 		return
 	}
 
-	var state *MSGraphResourceActionModel
+	var state *VerifiedIDResourceActionModel
 	if response.Diagnostics.Append(request.State.Get(ctx, &state)...); response.Diagnostics.HasError() {
 		return
 	}
 }
 
-func (r *MSGraphResourceAction) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var model *MSGraphResourceActionModel
+func (r *VerifiedIDResourceAction) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var model *VerifiedIDResourceActionModel
 	if resp.Diagnostics.Append(req.Plan.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -198,9 +198,9 @@ func (r *MSGraphResourceAction) Create(ctx context.Context, req resource.CreateR
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 }
 
-func (r *MSGraphResourceAction) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *VerifiedIDResourceAction) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Since this is an action resource, update should re-execute the action
-	var model *MSGraphResourceActionModel
+	var model *VerifiedIDResourceActionModel
 	if resp.Diagnostics.Append(req.Plan.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -220,7 +220,7 @@ func (r *MSGraphResourceAction) Update(ctx context.Context, req resource.UpdateR
 }
 
 // executeAction is a helper function that performs the actual API call
-func (r *MSGraphResourceAction) executeAction(ctx context.Context, model *MSGraphResourceActionModel) error {
+func (r *VerifiedIDResourceAction) executeAction(ctx context.Context, model *VerifiedIDResourceActionModel) error {
 	// Prepare request body
 	var requestBody interface{}
 	if !model.Body.IsNull() && !model.Body.IsUnknown() {
@@ -257,8 +257,8 @@ func (r *MSGraphResourceAction) executeAction(ctx context.Context, model *MSGrap
 	return nil
 }
 
-func (r *MSGraphResourceAction) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var model *MSGraphResourceActionModel
+func (r *VerifiedIDResourceAction) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var model *VerifiedIDResourceActionModel
 	if resp.Diagnostics.Append(req.State.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -268,9 +268,9 @@ func (r *MSGraphResourceAction) Read(ctx context.Context, req resource.ReadReque
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 }
 
-func (r *MSGraphResourceAction) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *VerifiedIDResourceAction) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// For action resources, delete is typically a no-op since actions are one-time operations
-	var model *MSGraphResourceActionModel
+	var model *VerifiedIDResourceActionModel
 	if resp.Diagnostics.Append(req.State.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}

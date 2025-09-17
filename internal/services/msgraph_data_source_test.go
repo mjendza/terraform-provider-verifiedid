@@ -10,11 +10,11 @@ import (
 	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance/check"
 )
 
-type MSGraphTestDataSource struct{}
+type VerifiedIDTestDataSource struct{}
 
 func TestAcc_DataSourceBasic(t *testing.T) {
-	data := acceptance.BuildTestData(t, "data.msgraph_resource", "test")
-	r := MSGraphTestDataSource{}
+	data := acceptance.BuildTestData(t, "data.verifiedid_resource", "test")
+	r := VerifiedIDTestDataSource{}
 
 	data.DataSourceTest(t, []resource.TestStep{
 		{
@@ -28,8 +28,8 @@ func TestAcc_DataSourceBasic(t *testing.T) {
 }
 
 func TestAcc_DataSourceQueryParameters(t *testing.T) {
-	data := acceptance.BuildTestData(t, "data.msgraph_resource", "test")
-	r := MSGraphTestDataSource{}
+	data := acceptance.BuildTestData(t, "data.verifiedid_resource", "test")
+	r := VerifiedIDTestDataSource{}
 
 	data.DataSourceTest(t, []resource.TestStep{
 		{
@@ -42,8 +42,8 @@ func TestAcc_DataSourceQueryParameters(t *testing.T) {
 }
 
 func TestAcc_DataSourceList(t *testing.T) {
-	data := acceptance.BuildTestData(t, "data.msgraph_resource", "test")
-	r := MSGraphTestDataSource{}
+	data := acceptance.BuildTestData(t, "data.verifiedid_resource", "test")
+	r := VerifiedIDTestDataSource{}
 
 	data.DataSourceTest(t, []resource.TestStep{
 		{
@@ -56,8 +56,8 @@ func TestAcc_DataSourceList(t *testing.T) {
 }
 
 func TestAcc_DataSourceRetry(t *testing.T) {
-	data := acceptance.BuildTestData(t, "data.msgraph_resource", "test")
-	r := MSGraphTestDataSource{}
+	data := acceptance.BuildTestData(t, "data.verifiedid_resource", "test")
+	r := VerifiedIDTestDataSource{}
 
 	data.DataSourceTest(t, []resource.TestStep{
 		{
@@ -70,8 +70,8 @@ func TestAcc_DataSourceRetry(t *testing.T) {
 }
 
 func TestAcc_DataSourceTimeouts_Read(t *testing.T) {
-	data := acceptance.BuildTestData(t, "data.msgraph_resource", "test")
-	r := MSGraphTestDataSource{}
+	data := acceptance.BuildTestData(t, "data.verifiedid_resource", "test")
+	r := VerifiedIDTestDataSource{}
 
 	data.DataSourceTest(t, []resource.TestStep{
 		{
@@ -81,23 +81,23 @@ func TestAcc_DataSourceTimeouts_Read(t *testing.T) {
 	})
 }
 
-func (r MSGraphTestDataSource) basic(data acceptance.TestData) string {
+func (r VerifiedIDTestDataSource) basic(data acceptance.TestData) string {
 	return fmt.Sprintf(`
 %s
 
-data "msgraph_resource" "test" {
-  url = "applications/${msgraph_resource.test.id}"
+data "verifiedid_resource" "test" {
+  url = "applications/${verifiedid_resource.test.id}"
 }
-`, MSGraphTestResource{}.basic(data))
+`, VerifiedIDTestResource{}.basic(data))
 }
 
-func (r MSGraphTestDataSource) query(data acceptance.TestData) string {
+func (r VerifiedIDTestDataSource) query(data acceptance.TestData) string {
 	return `
 locals {
   MicrosoftGraphAppId = "00000003-0000-0000-c000-000000000000"
 }
 
-data "msgraph_resource" "test" {
+data "verifiedid_resource" "test" {
   url = "servicePrincipals"
   query_parameters = {
     "$filter" = ["appId eq '${local.MicrosoftGraphAppId}'"]
@@ -108,9 +108,9 @@ data "msgraph_resource" "test" {
 }`
 }
 
-func (r MSGraphTestDataSource) list(data acceptance.TestData) string {
+func (r VerifiedIDTestDataSource) list(data acceptance.TestData) string {
 	return `
-data "msgraph_resource" "test" {
+data "verifiedid_resource" "test" {
   url = "groups"
   response_export_values = {
     all = "@"
@@ -118,9 +118,9 @@ data "msgraph_resource" "test" {
 }`
 }
 
-func (r MSGraphTestDataSource) withRetry(data acceptance.TestData) string {
+func (r VerifiedIDTestDataSource) withRetry(data acceptance.TestData) string {
 	return `
-data "msgraph_resource" "test" {
+data "verifiedid_resource" "test" {
   url = "groups"
   retry = {
     error_message_regex = [
@@ -135,14 +135,14 @@ data "msgraph_resource" "test" {
 `
 }
 
-func (r MSGraphTestDataSource) withReadTimeout(data acceptance.TestData) string {
-	return MSGraphTestResource{}.basic(data) + "\n" + r.dataSourceWithReadTimeout()
+func (r VerifiedIDTestDataSource) withReadTimeout(data acceptance.TestData) string {
+	return VerifiedIDTestResource{}.basic(data) + "\n" + r.dataSourceWithReadTimeout()
 }
 
-func (r MSGraphTestDataSource) dataSourceWithReadTimeout() string {
+func (r VerifiedIDTestDataSource) dataSourceWithReadTimeout() string {
 	return `
-data "msgraph_resource" "test" {
-  url = "applications/${msgraph_resource.test.id}"
+data "verifiedid_resource" "test" {
+  url = "applications/${verifiedid_resource.test.id}"
   timeouts {
     read = "1ns"
   }

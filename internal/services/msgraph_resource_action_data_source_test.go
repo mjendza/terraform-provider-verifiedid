@@ -10,17 +10,17 @@ import (
 	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
 )
 
-type MSGraphResourceActionDataSourceTestResource struct{}
+type VerifiedIDResourceActionDataSourceTestResource struct{}
 
-func (MSGraphResourceActionDataSourceTestResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
+func (VerifiedIDResourceActionDataSourceTestResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
 	exists := true
 	return &exists, nil
 }
 
 func TestAcc_DataSourceResourceActionBasic(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionDataSourceTestResource{}
+	r := VerifiedIDResourceActionDataSourceTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -31,9 +31,9 @@ func TestAcc_DataSourceResourceActionBasic(t *testing.T) {
 }
 
 func TestAcc_DataSourceResourceActionWithQueryParams(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionDataSourceTestResource{}
+	r := VerifiedIDResourceActionDataSourceTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -44,9 +44,9 @@ func TestAcc_DataSourceResourceActionWithQueryParams(t *testing.T) {
 }
 
 func TestAcc_DataSourceResourceActionWithHeaders(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionDataSourceTestResource{}
+	r := VerifiedIDResourceActionDataSourceTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -57,9 +57,9 @@ func TestAcc_DataSourceResourceActionWithHeaders(t *testing.T) {
 }
 
 func TestAcc_DataSourceResourceActionWithBody(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionDataSourceTestResource{}
+	r := VerifiedIDResourceActionDataSourceTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -69,11 +69,11 @@ func TestAcc_DataSourceResourceActionWithBody(t *testing.T) {
 	})
 }
 
-func (r MSGraphResourceActionDataSourceTestResource) basic() string {
+func (r VerifiedIDResourceActionDataSourceTestResource) basic() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -87,19 +87,19 @@ resource "msgraph_resource" "group" {
   }
 }
 
-data "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+data "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   action       = "members"
   method       = "GET"
 }
 `
 }
 
-func (r MSGraphResourceActionDataSourceTestResource) withQueryParams() string {
+func (r VerifiedIDResourceActionDataSourceTestResource) withQueryParams() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -113,8 +113,8 @@ resource "msgraph_resource" "group" {
   }
 }
 
-data "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+data "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   action       = "owners"
   method       = "GET"
 
@@ -126,11 +126,11 @@ data "msgraph_resource_action" "test" {
 `
 }
 
-func (r MSGraphResourceActionDataSourceTestResource) withHeaders() string {
+func (r VerifiedIDResourceActionDataSourceTestResource) withHeaders() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -144,8 +144,8 @@ resource "msgraph_resource" "group" {
   }
 }
 
-data "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+data "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   action       = "owners"
   method       = "GET"
 
@@ -156,11 +156,11 @@ data "msgraph_resource_action" "test" {
 `
 }
 
-func (r MSGraphResourceActionDataSourceTestResource) withBody() string {
+func (r VerifiedIDResourceActionDataSourceTestResource) withBody() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -174,8 +174,8 @@ resource "msgraph_resource" "group" {
   }
 }
 
-data "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+data "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   action       = "checkMemberObjects"
   method       = "POST"
 
