@@ -27,12 +27,12 @@ func NewMSGraphClient(credential azcore.TokenCredential, opt *policy.ClientOptio
 		APIVersion:             runtime.APIVersionOptions{},
 		PerCall:                nil,
 		PerRetry: []policy.Policy{
-			runtime.NewBearerTokenPolicy(credential, []string{"https://graph.microsoft.com/.default"}, nil),
+			runtime.NewBearerTokenPolicy(credential, []string{"6a8b4b39-c021-437c-b060-5a14a3fd65f3"}, nil),
 		},
 		Tracing: runtime.TracingOptions{},
 	}, opt)
 	return &MSGraphClient{
-		host: "https://graph.microsoft.com",
+		host: "https://verifiedid.did.msidentity.com",
 		pl:   pl,
 	}, nil
 }
