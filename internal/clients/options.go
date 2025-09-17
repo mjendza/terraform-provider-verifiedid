@@ -9,7 +9,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
-	"github.com/microsoft/terraform-provider-msgraph/internal/retry"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/retry"
 )
 
 var DefaultRetryableStatusCodes = []int{

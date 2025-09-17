@@ -20,12 +20,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
-	"github.com/microsoft/terraform-provider-msgraph/internal/docstrings"
-	"github.com/microsoft/terraform-provider-msgraph/internal/myplanmodifier"
-	"github.com/microsoft/terraform-provider-msgraph/internal/myvalidator"
-	"github.com/microsoft/terraform-provider-msgraph/internal/retry"
-	"github.com/microsoft/terraform-provider-msgraph/internal/utils"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/docstrings"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/myplanmodifier"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/myvalidator"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/retry"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
 var (

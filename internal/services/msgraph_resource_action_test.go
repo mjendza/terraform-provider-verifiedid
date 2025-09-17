@@ -6,9 +6,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance"
-	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance/check"
-	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance/check"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
 )
 
 type MSGraphResourceActionTestResource struct{}
