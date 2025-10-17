@@ -11,6 +11,9 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 )
 
+// VerifiedIDClient is a type alias for MSGraphClient for compatibility
+type VerifiedIDClient = MSGraphClient
+
 type Client struct {
 	// StopContext is used for propagating control from Terraform Core (e.g. Ctrl/Cmd+C)
 	StopContext context.Context
