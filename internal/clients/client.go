@@ -16,6 +16,8 @@ type Client struct {
 	StopContext context.Context
 
 	MSGraphClient *MSGraphClient
+	// VerifiedIDClient is an alias to MSGraphClient for compatibility
+	VerifiedIDClient *MSGraphClient
 
 	Option *Option
 }
@@ -100,6 +102,8 @@ func (client *Client) Build(ctx context.Context, o *Option) error {
 	}
 
 	client.MSGraphClient = msgraphClient
+	// Set VerifiedIDClient as an alias for backward compatibility
+	client.VerifiedIDClient = msgraphClient
 
 	return nil
 }
