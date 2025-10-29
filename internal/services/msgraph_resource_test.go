@@ -9,22 +9,22 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance"
-	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance/check"
-	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
-	"github.com/microsoft/terraform-provider-msgraph/internal/utils"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance/check"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
 func defaultIgnores() []string {
 	return []string{"body", "output", "retry"}
 }
 
-type MSGraphTestResource struct{}
+type VerifiedIDTestResource struct{}
 
 func TestAcc_ResourceBasic(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -40,9 +40,9 @@ func TestAcc_ResourceBasic(t *testing.T) {
 }
 
 func TestAcc_ResourceUpdate(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -67,9 +67,9 @@ func TestAcc_ResourceUpdate(t *testing.T) {
 }
 
 func TestAcc_ResourceGroupMember(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	importStep := data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...)
 	importStep.ImportStateVerify = false
@@ -79,7 +79,7 @@ func TestAcc_ResourceGroupMember(t *testing.T) {
 			Check: resource.ComposeTestCheckFunc(
 				check.That(data.ResourceName).Exists(r),
 				check.That(data.ResourceName).Key("id").IsUUID(),
-				check.That(data.ResourceName).Key("id").MatchesOtherKey(check.That("msgraph_resource.servicePrincipal_application").Key("id")),
+				check.That(data.ResourceName).Key("id").MatchesOtherKey(check.That("verifiedid_resource.servicePrincipal_application").Key("id")),
 				check.That(data.ResourceName).Key("resource_url").MatchesRegex(regexp.MustCompile(`^groups/[a-f0-9\-]+/members/[a-f0-9\-]+$`)),
 			),
 		},
@@ -88,9 +88,9 @@ func TestAcc_ResourceGroupMember(t *testing.T) {
 }
 
 func TestAcc_ResourceIgnoreMissingProperty(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -106,9 +106,9 @@ func TestAcc_ResourceIgnoreMissingProperty(t *testing.T) {
 }
 
 func TestAcc_ResourceGroupOwnerBind_UpdateDisplayName(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	importStep := data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...)
 	importStep.ImportStateVerify = false
@@ -136,9 +136,9 @@ func TestAcc_ResourceGroupOwnerBind_UpdateDisplayName(t *testing.T) {
 }
 
 func TestAcc_ResourceRetry(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -154,9 +154,9 @@ func TestAcc_ResourceRetry(t *testing.T) {
 }
 
 func TestAcc_ResourceTimeouts_Create(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -168,9 +168,9 @@ func TestAcc_ResourceTimeouts_Create(t *testing.T) {
 }
 
 func TestAcc_ResourceTimeouts_Update(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
-	r := MSGraphTestResource{}
+	r := VerifiedIDTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -188,7 +188,7 @@ func TestAcc_ResourceTimeouts_Update(t *testing.T) {
 	})
 }
 
-func (r MSGraphTestResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
+func (r VerifiedIDTestResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
 	apiVersion := state.Attributes["api_version"]
 	url := state.Attributes["url"]
 
@@ -199,7 +199,7 @@ func (r MSGraphTestResource) Exists(ctx context.Context, client *clients.Client,
 		checkUrl = url
 	}
 
-	_, err := client.MSGraphClient.Read(ctx, checkUrl, apiVersion, clients.DefaultRequestOptions())
+	_, err := client.VerifiedIDClient.Read(ctx, checkUrl, apiVersion, clients.DefaultRequestOptions())
 	if err == nil {
 		b := true
 		return &b, nil
@@ -211,8 +211,8 @@ func (r MSGraphTestResource) Exists(ctx context.Context, client *clients.Client,
 	return nil, fmt.Errorf("checking for presence of existing %s(api_version=%s) resource: %w", state.ID, apiVersion, err)
 }
 
-func (r MSGraphTestResource) ImportIdFunc(tfState *terraform.State) (string, error) {
-	state := tfState.RootModule().Resources["msgraph_resource.test"].Primary
+func (r VerifiedIDTestResource) ImportIdFunc(tfState *terraform.State) (string, error) {
+	state := tfState.RootModule().Resources["verifiedid_resource.test"].Primary
 	url := state.Attributes["url"]
 	if !strings.Contains(url, "/$ref") {
 		return fmt.Sprintf("%s/%s", url, state.ID), nil
@@ -220,9 +220,9 @@ func (r MSGraphTestResource) ImportIdFunc(tfState *terraform.State) (string, err
 	return strings.ReplaceAll(url, "/$ref", fmt.Sprintf("/%s/$ref", state.ID)), nil
 }
 
-func (r MSGraphTestResource) basic(data acceptance.TestData) string {
+func (r VerifiedIDTestResource) basic(data acceptance.TestData) string {
 	return `
-resource "msgraph_resource" "test" {
+resource "verifiedid_resource" "test" {
   url = "applications"
   body = {
     displayName = "Demo App"
@@ -231,9 +231,9 @@ resource "msgraph_resource" "test" {
 `
 }
 
-func (r MSGraphTestResource) basicUpdate(data acceptance.TestData) string {
+func (r VerifiedIDTestResource) basicUpdate(data acceptance.TestData) string {
 	return `
-resource "msgraph_resource" "test" {
+resource "verifiedid_resource" "test" {
   url = "applications"
   body = {
     displayName = "Demo App Updated"
@@ -242,9 +242,9 @@ resource "msgraph_resource" "test" {
 `
 }
 
-func (r MSGraphTestResource) groupMember() string {
+func (r VerifiedIDTestResource) groupMember() string {
 	return `
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "My Application"
@@ -254,14 +254,14 @@ resource "msgraph_resource" "application" {
   }
 }
 
-resource "msgraph_resource" "servicePrincipal_application" {
+resource "verifiedid_resource" "servicePrincipal_application" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application.output.appId
+    appId = verifiedid_resource.application.output.appId
   }
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "My Group"
@@ -271,18 +271,18 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource" "test" {
-  url = "groups/${msgraph_resource.group.id}/members/$ref"
+resource "verifiedid_resource" "test" {
+  url = "groups/${verifiedid_resource.group.id}/members/$ref"
   body = {
-    "@odata.id" = "https://graph.microsoft.com/v1.0/directoryObjects/${msgraph_resource.servicePrincipal_application.id}"
+    "@odata.id" = "https://graph.microsoft.com/v1.0/directoryObjects/${verifiedid_resource.servicePrincipal_application.id}"
   }
 }
 `
 }
 
-func (r MSGraphTestResource) groupOwnerBind(displayName string) string {
+func (r VerifiedIDTestResource) groupOwnerBind(displayName string) string {
 	return fmt.Sprintf(`
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "My Application"
@@ -292,14 +292,14 @@ resource "msgraph_resource" "application" {
   }
 }
 
-resource "msgraph_resource" "servicePrincipal_application" {
+resource "verifiedid_resource" "servicePrincipal_application" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application.output.appId
+    appId = verifiedid_resource.application.output.appId
   }
 }
 
-resource "msgraph_resource" "test" {
+resource "verifiedid_resource" "test" {
   url = "groups"
   body = {
     displayName     = "%s"
@@ -307,16 +307,16 @@ resource "msgraph_resource" "test" {
     mailNickname    = "mygroup-owners-bind"
     securityEnabled = true
     "owners@odata.bind" = [
-      "https://graph.microsoft.com/v1.0/directoryObjects/${msgraph_resource.servicePrincipal_application.id}"
+      "https://graph.microsoft.com/v1.0/directoryObjects/${verifiedid_resource.servicePrincipal_application.id}"
     ]
   }
 }
 `, displayName)
 }
 
-func (r MSGraphTestResource) withRetry() string {
+func (r VerifiedIDTestResource) withRetry() string {
 	return `
-resource "msgraph_resource" "test" {
+resource "verifiedid_resource" "test" {
   url = "applications"
   body = {
     displayName = "Demo App Retry"
@@ -330,9 +330,9 @@ resource "msgraph_resource" "test" {
 }`
 }
 
-func (r MSGraphTestResource) withCreateTimeout() string {
+func (r VerifiedIDTestResource) withCreateTimeout() string {
 	return `
-resource "msgraph_resource" "test" {
+resource "verifiedid_resource" "test" {
   url = "applications"
   timeouts {
     create = "1ns"
@@ -344,9 +344,9 @@ resource "msgraph_resource" "test" {
 `
 }
 
-func (r MSGraphTestResource) withUpdateTimeout() string {
+func (r VerifiedIDTestResource) withUpdateTimeout() string {
 	return `
-resource "msgraph_resource" "test" {
+resource "verifiedid_resource" "test" {
   url = "applications"
   timeouts {
     update = "1ns"

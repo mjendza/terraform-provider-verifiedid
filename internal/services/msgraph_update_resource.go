@@ -19,35 +19,35 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
-	"github.com/microsoft/terraform-provider-msgraph/internal/docstrings"
-	"github.com/microsoft/terraform-provider-msgraph/internal/dynamic"
-	"github.com/microsoft/terraform-provider-msgraph/internal/retry"
-	"github.com/microsoft/terraform-provider-msgraph/internal/utils"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/docstrings"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/dynamic"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/retry"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var (
-	_ resource.Resource                     = &MSGraphUpdateResource{}
-	_ resource.ResourceWithConfigValidators = &MSGraphUpdateResource{}
-	_ resource.ResourceWithModifyPlan       = &MSGraphUpdateResource{}
+	_ resource.Resource                     = &VerifiedIDUpdateResource{}
+	_ resource.ResourceWithConfigValidators = &VerifiedIDUpdateResource{}
+	_ resource.ResourceWithModifyPlan       = &VerifiedIDUpdateResource{}
 )
 
-func NewMSGraphUpdateResource() resource.Resource {
-	return &MSGraphUpdateResource{}
+func NewVerifiedIDUpdateResource() resource.Resource {
+	return &VerifiedIDUpdateResource{}
 }
 
-// MSGraphUpdateResource defines the resource implementation.
-type MSGraphUpdateResource struct {
-	client *clients.MSGraphClient
+// VerifiedIDUpdateResource defines the resource implementation.
+type VerifiedIDUpdateResource struct {
+	client *clients.VerifiedIDClient
 }
 
-func (r *MSGraphUpdateResource) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
+func (r *VerifiedIDUpdateResource) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{}
 }
 
-// MSGraphUpdateResourceModel describes the resource data model.
-type MSGraphUpdateResourceModel struct {
+// VerifiedIDUpdateResourceModel describes the resource data model.
+type VerifiedIDUpdateResourceModel struct {
 	Id                    types.String      `tfsdk:"id"`
 	ApiVersion            types.String      `tfsdk:"api_version"`
 	Url                   types.String      `tfsdk:"url"`
@@ -61,14 +61,14 @@ type MSGraphUpdateResourceModel struct {
 	Timeouts              timeouts.Value    `tfsdk:"timeouts"`
 }
 
-func (r *MSGraphUpdateResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *VerifiedIDUpdateResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_update_resource"
 }
 
-func (r *MSGraphUpdateResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *VerifiedIDUpdateResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "This resource can manage a subset of any existing Microsoft Graph resource's properties.\n\n" +
-			"-> **Note** This resource is used to add or modify properties on an existing resource. When `msgraph_update_resource` is deleted, no operation will be performed, and these properties will stay unchanged. If you want to restore the modified properties to some values, you must apply the restored properties before deleting.",
+			"-> **Note** This resource is used to add or modify properties on an existing resource. When `verifiedid_update_resource` is deleted, no operation will be performed, and these properties will stay unchanged. If you want to restore the modified properties to some values, you must apply the restored properties before deleting.",
 		Description: "This resource can manage a subset of any existing Microsoft Graph resource's properties.",
 
 		Attributes: map[string]schema.Attribute{
@@ -148,27 +148,27 @@ func (r *MSGraphUpdateResource) Schema(ctx context.Context, req resource.SchemaR
 	}
 }
 
-func (r *MSGraphUpdateResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *VerifiedIDUpdateResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if v, ok := req.ProviderData.(*clients.Client); ok {
-		r.client = v.MSGraphClient
+		r.client = v.VerifiedIDClient
 	}
 }
 
-func (r *MSGraphUpdateResource) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
-	var plan *MSGraphUpdateResourceModel
+func (r *VerifiedIDUpdateResource) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
+	var plan *VerifiedIDUpdateResourceModel
 	if response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...); response.Diagnostics.HasError() {
 		return
 	}
 
-	var state *MSGraphUpdateResourceModel
+	var state *VerifiedIDUpdateResourceModel
 	if response.Diagnostics.Append(request.State.Get(ctx, &state)...); response.Diagnostics.HasError() {
 		return
 	}
 }
 
-func (r *MSGraphUpdateResource) CreateUpdate(ctx context.Context, plan tfsdk.Plan, state *tfsdk.State, diagnostics *diag.Diagnostics, isCreate bool) {
-	var model MSGraphUpdateResourceModel
-	var stateModel *MSGraphUpdateResourceModel
+func (r *VerifiedIDUpdateResource) CreateUpdate(ctx context.Context, plan tfsdk.Plan, state *tfsdk.State, diagnostics *diag.Diagnostics, isCreate bool) {
+	var model VerifiedIDUpdateResourceModel
+	var stateModel *VerifiedIDUpdateResourceModel
 	diagnostics.Append(plan.Get(ctx, &model)...)
 	diagnostics.Append(state.Get(ctx, &stateModel)...)
 	if diagnostics.HasError() {
@@ -221,16 +221,16 @@ func (r *MSGraphUpdateResource) CreateUpdate(ctx context.Context, plan tfsdk.Pla
 	diagnostics.Append(state.Set(ctx, &model)...)
 }
 
-func (r *MSGraphUpdateResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *VerifiedIDUpdateResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	r.CreateUpdate(ctx, request.Plan, &response.State, &response.Diagnostics, true)
 }
 
-func (r *MSGraphUpdateResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *VerifiedIDUpdateResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	r.CreateUpdate(ctx, req.Plan, &resp.State, &resp.Diagnostics, false)
 }
 
-func (r *MSGraphUpdateResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var model *MSGraphUpdateResourceModel
+func (r *VerifiedIDUpdateResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var model *VerifiedIDUpdateResourceModel
 	if resp.Diagnostics.Append(req.State.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -297,5 +297,5 @@ func (r *MSGraphUpdateResource) Read(ctx context.Context, req resource.ReadReque
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
-func (r *MSGraphUpdateResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *VerifiedIDUpdateResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 }

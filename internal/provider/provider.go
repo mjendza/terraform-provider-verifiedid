@@ -18,17 +18,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
-	"github.com/microsoft/terraform-provider-msgraph/internal/myvalidator"
-	"github.com/microsoft/terraform-provider-msgraph/internal/services"
-	"github.com/microsoft/terraform-provider-msgraph/version"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/myvalidator"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/services"
+	"github.com/mjendza/terraform-provider-verifiedid/version"
 )
 
-var _ provider.Provider = &MSGraphProvider{}
+var _ provider.Provider = &VerifiedIDProvider{}
 
-type MSGraphProvider struct{}
+type VerifiedIDProvider struct{}
 
-type MSGraphProviderModel struct {
+type VerifiedIDProviderModel struct {
 	ClientID                     types.String `tfsdk:"client_id"`
 	ClientIDFilePath             types.String `tfsdk:"client_id_file_path"`
 	TenantID                     types.String `tfsdk:"tenant_id"`
@@ -54,11 +54,11 @@ type MSGraphProviderModel struct {
 
 func New() func() provider.Provider {
 	return func() provider.Provider {
-		return &MSGraphProvider{}
+		return &VerifiedIDProvider{}
 	}
 }
 
-func (model MSGraphProviderModel) GetClientId() (*string, error) {
+func (model VerifiedIDProviderModel) GetClientId() (*string, error) {
 	clientId := strings.TrimSpace(model.ClientID.ValueString())
 
 	if path := model.ClientIDFilePath.ValueString(); path != "" {
@@ -88,7 +88,7 @@ func (model MSGraphProviderModel) GetClientId() (*string, error) {
 	return &clientId, nil
 }
 
-func (model MSGraphProviderModel) GetClientSecret() (*string, error) {
+func (model VerifiedIDProviderModel) GetClientSecret() (*string, error) {
 	clientSecret := strings.TrimSpace(model.ClientSecret.ValueString())
 
 	if path := model.ClientSecretFilePath.ValueString(); path != "" {
@@ -110,7 +110,7 @@ func (model MSGraphProviderModel) GetClientSecret() (*string, error) {
 	return &clientSecret, nil
 }
 
-func (model MSGraphProviderModel) GetOIDCTokenFilePath() string {
+func (model VerifiedIDProviderModel) GetOIDCTokenFilePath() string {
 	if !model.OIDCTokenFilePath.IsNull() && model.OIDCTokenFilePath.ValueString() != "" {
 		return model.OIDCTokenFilePath.ValueString()
 	}
@@ -122,13 +122,13 @@ func (model MSGraphProviderModel) GetOIDCTokenFilePath() string {
 	return ""
 }
 
-func (p *MSGraphProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "msgraph"
+func (p *VerifiedIDProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "verifiedid"
 }
 
-func (p *MSGraphProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *VerifiedIDProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "MSGraph provider",
+		Description: "VerifiedID provider",
 		Attributes: map[string]schema.Attribute{
 			"client_id": schema.StringAttribute{
 				Optional:            true,
@@ -247,8 +247,8 @@ func (p *MSGraphProvider) Schema(ctx context.Context, req provider.SchemaRequest
 	}
 }
 
-func (p *MSGraphProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	var model MSGraphProviderModel
+func (p *VerifiedIDProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var model VerifiedIDProviderModel
 	if resp.Diagnostics.Append(req.Config.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -431,7 +431,7 @@ func (p *MSGraphProvider) Configure(ctx context.Context, req provider.ConfigureR
 	resp.ResourceData = client
 }
 
-func (p *MSGraphProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *VerifiedIDProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		services.NewMSGraphResource,
 		services.NewMSGraphResourceAction,
@@ -440,7 +440,7 @@ func (p *MSGraphProvider) Resources(ctx context.Context) []func() resource.Resou
 	}
 }
 
-func (p *MSGraphProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *VerifiedIDProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		services.NewMSGraphDataSource,
 		services.NewMSGraphResourceActionDataSource,
@@ -454,7 +454,7 @@ func buildUserAgent(terraformVersion string, partnerID string, disableTerraformP
 		terraformVersion = "0.11+compatible"
 	}
 	tfUserAgent := fmt.Sprintf("HashiCorp Terraform/%s (+https://www.terraform.io)", terraformVersion)
-	providerUserAgent := fmt.Sprintf("terraform-provider-msgraph/%s", version.ProviderVersion)
+	providerUserAgent := fmt.Sprintf("terraform-provider-verifiedid/%s", version.ProviderVersion)
 	userAgent := strings.TrimSpace(fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent))
 
 	// append the CloudShell version to the user agent if it exists
@@ -476,7 +476,7 @@ func buildUserAgent(terraformVersion string, partnerID string, disableTerraformP
 	return userAgent
 }
 
-func BuildChainedTokenCredential(model MSGraphProviderModel, options azidentity.DefaultAzureCredentialOptions) (*azidentity.ChainedTokenCredential, error) {
+func BuildChainedTokenCredential(model VerifiedIDProviderModel, options azidentity.DefaultAzureCredentialOptions) (*azidentity.ChainedTokenCredential, error) {
 	log.Printf("[DEBUG] building chained token credential")
 	var creds []azcore.TokenCredential
 
@@ -533,7 +533,7 @@ func BuildChainedTokenCredential(model MSGraphProviderModel, options azidentity.
 	return azidentity.NewChainedTokenCredential(creds, nil)
 }
 
-func buildClientSecretCredential(model MSGraphProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
+func buildClientSecretCredential(model VerifiedIDProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
 	log.Printf("[DEBUG] building client secret credential")
 	clientID, err := model.GetClientId()
 	if err != nil {
@@ -551,7 +551,7 @@ func buildClientSecretCredential(model MSGraphProviderModel, options azidentity.
 	return azidentity.NewClientSecretCredential(options.TenantID, *clientID, *clientSecret, o)
 }
 
-func buildClientCertificateCredential(model MSGraphProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
+func buildClientCertificateCredential(model VerifiedIDProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
 	log.Printf("[DEBUG] building client certificate credential")
 	clientID, err := model.GetClientId()
 	if err != nil {
@@ -595,7 +595,7 @@ func buildClientCertificateCredential(model MSGraphProviderModel, options aziden
 	return azidentity.NewClientCertificateCredential(options.TenantID, *clientID, certs, key, o)
 }
 
-func buildOidcCredential(model MSGraphProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
+func buildOidcCredential(model VerifiedIDProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
 	log.Printf("[DEBUG] building oidc credential")
 	clientId, err := model.GetClientId()
 	if err != nil {
@@ -619,7 +619,7 @@ func buildOidcCredential(model MSGraphProviderModel, options azidentity.DefaultA
 	return NewOidcCredential(o)
 }
 
-func buildManagedIdentityCredential(model MSGraphProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
+func buildManagedIdentityCredential(model VerifiedIDProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
 	log.Printf("[DEBUG] building managed identity credential")
 	clientId, err := model.GetClientId()
 	if err != nil {
@@ -641,7 +641,7 @@ func buildAzureCLICredential(options azidentity.DefaultAzureCredentialOptions) (
 	return azidentity.NewAzureCLICredential(o)
 }
 
-func buildAzurePipelinesCredential(model MSGraphProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
+func buildAzurePipelinesCredential(model VerifiedIDProviderModel, options azidentity.DefaultAzureCredentialOptions) (azcore.TokenCredential, error) {
 	log.Printf("[DEBUG] building azure pipeline credential")
 	o := &azidentity.AzurePipelinesCredentialOptions{
 		ClientOptions:              options.ClientOptions,

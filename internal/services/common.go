@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/microsoft/terraform-provider-msgraph/internal/dynamic"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/dynamic"
 )
 
 func AsMapOfString(input types.Map) map[string]string {

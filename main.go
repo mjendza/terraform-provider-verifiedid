@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/microsoft/terraform-provider-msgraph/internal/provider"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/provider"
 )
 
 // Run the docs generation tool, check its repository for more information on how it works and how docs
@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/microsoft/msgraph",
+		Address: "registry.terraform.io/mjendza/verifiedid",
 		Debug:   debug,
 	}
 

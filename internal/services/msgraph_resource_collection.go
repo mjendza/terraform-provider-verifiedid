@@ -20,27 +20,27 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
-	"github.com/microsoft/terraform-provider-msgraph/internal/docstrings"
-	"github.com/microsoft/terraform-provider-msgraph/internal/myplanmodifier"
-	"github.com/microsoft/terraform-provider-msgraph/internal/myvalidator"
-	"github.com/microsoft/terraform-provider-msgraph/internal/retry"
-	"github.com/microsoft/terraform-provider-msgraph/internal/utils"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/docstrings"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/myplanmodifier"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/myvalidator"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/retry"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
 var (
-	_ resource.Resource               = &MSGraphResourceCollection{}
-	_ resource.ResourceWithConfigure  = &MSGraphResourceCollection{}
-	_ resource.ResourceWithModifyPlan = &MSGraphResourceCollection{}
+	_ resource.Resource               = &VerifiedIDResourceCollection{}
+	_ resource.ResourceWithConfigure  = &VerifiedIDResourceCollection{}
+	_ resource.ResourceWithModifyPlan = &VerifiedIDResourceCollection{}
 )
 
-func NewMSGraphResourceCollection() resource.Resource {
-	return &MSGraphResourceCollection{}
+func NewVerifiedIDResourceCollection() resource.Resource {
+	return &VerifiedIDResourceCollection{}
 }
 
-type MSGraphResourceCollection struct{ client *clients.MSGraphClient }
+type VerifiedIDResourceCollection struct{ client *clients.VerifiedIDClient }
 
-type MSGraphResourceCollectionModel struct {
+type VerifiedIDResourceCollectionModel struct {
 	Id                   types.String      `tfsdk:"id"`
 	ApiVersion           types.String      `tfsdk:"api_version"`
 	Url                  types.String      `tfsdk:"url"`
@@ -52,11 +52,11 @@ type MSGraphResourceCollectionModel struct {
 	Timeouts             timeouts.Value    `tfsdk:"timeouts"`
 }
 
-func (r *MSGraphResourceCollection) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *VerifiedIDResourceCollection) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_resource_collection"
 }
 
-func (r *MSGraphResourceCollection) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *VerifiedIDResourceCollection) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Manage the full contents of a child reference collection (such as group members or owners) for an existing Microsoft Graph resource. Missing items are added; extra remote items are removed.",
 		Attributes: map[string]schema.Attribute{
@@ -119,14 +119,14 @@ func (r *MSGraphResourceCollection) Schema(ctx context.Context, req resource.Sch
 	}
 }
 
-func (r *MSGraphResourceCollection) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *VerifiedIDResourceCollection) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if v, ok := req.ProviderData.(*clients.Client); ok {
-		r.client = v.MSGraphClient
+		r.client = v.VerifiedIDClient
 	}
 }
 
-func (r *MSGraphResourceCollection) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
-	var plan, state *MSGraphResourceCollectionModel
+func (r *VerifiedIDResourceCollection) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
+	var plan, state *VerifiedIDResourceCollectionModel
 	if response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...); response.Diagnostics.HasError() {
 		return
 	}
@@ -145,8 +145,8 @@ func (r *MSGraphResourceCollection) ModifyPlan(ctx context.Context, request reso
 	response.Diagnostics.Append(response.Plan.Set(ctx, &plan)...)
 }
 
-func (r *MSGraphResourceCollection) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var model *MSGraphResourceCollectionModel
+func (r *VerifiedIDResourceCollection) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var model *VerifiedIDResourceCollectionModel
 	if resp.Diagnostics.Append(req.Plan.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -179,8 +179,8 @@ func (r *MSGraphResourceCollection) Create(ctx context.Context, req resource.Cre
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 }
 
-func (r *MSGraphResourceCollection) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var model, state *MSGraphResourceCollectionModel
+func (r *VerifiedIDResourceCollection) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var model, state *VerifiedIDResourceCollectionModel
 	if resp.Diagnostics.Append(req.Plan.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -215,8 +215,8 @@ func (r *MSGraphResourceCollection) Update(ctx context.Context, req resource.Upd
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 }
 
-func (r *MSGraphResourceCollection) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var model *MSGraphResourceCollectionModel
+func (r *VerifiedIDResourceCollection) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var model *VerifiedIDResourceCollectionModel
 	if resp.Diagnostics.Append(req.State.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -252,8 +252,8 @@ func (r *MSGraphResourceCollection) Read(ctx context.Context, req resource.ReadR
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 }
 
-func (r *MSGraphResourceCollection) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var model *MSGraphResourceCollectionModel
+func (r *VerifiedIDResourceCollection) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var model *VerifiedIDResourceCollectionModel
 	if resp.Diagnostics.Append(req.State.Get(ctx, &model)...); resp.Diagnostics.HasError() {
 		return
 	}
@@ -270,7 +270,7 @@ func (r *MSGraphResourceCollection) Delete(ctx context.Context, req resource.Del
 	}
 }
 
-func (r *MSGraphResourceCollection) syncCollection(ctx context.Context, model *MSGraphResourceCollectionModel, oldItems []string, newItems []string) error {
+func (r *VerifiedIDResourceCollection) syncCollection(ctx context.Context, model *VerifiedIDResourceCollectionModel, oldItems []string, newItems []string) error {
 	toRemove := make([]string, 0)
 	toAdd := make([]string, 0)
 	oldSet := make(map[string]bool)
@@ -294,7 +294,7 @@ func (r *MSGraphResourceCollection) syncCollection(ctx context.Context, model *M
 	return r.applyCollection(ctx, model, toRemove, toAdd)
 }
 
-func (r *MSGraphResourceCollection) applyCollection(ctx context.Context, model *MSGraphResourceCollectionModel, toRemove []string, toAdd []string) error {
+func (r *VerifiedIDResourceCollection) applyCollection(ctx context.Context, model *VerifiedIDResourceCollectionModel, toRemove []string, toAdd []string) error {
 	errs := make([]error, 0)
 	for _, item := range toAdd {
 		body := map[string]string{}

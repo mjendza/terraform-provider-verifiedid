@@ -6,17 +6,17 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance"
-	"github.com/microsoft/terraform-provider-msgraph/internal/acceptance/check"
-	"github.com/microsoft/terraform-provider-msgraph/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance/check"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
 )
 
-type MSGraphResourceActionTestResource struct{}
+type VerifiedIDResourceActionTestResource struct{}
 
 func TestAcc_ResourceActionBasic(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionTestResource{}
+	r := VerifiedIDResourceActionTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -27,9 +27,9 @@ func TestAcc_ResourceActionBasic(t *testing.T) {
 }
 
 func TestAcc_ResourceActionWithQueryParams(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionTestResource{}
+	r := VerifiedIDResourceActionTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -40,9 +40,9 @@ func TestAcc_ResourceActionWithQueryParams(t *testing.T) {
 }
 
 func TestAcc_ResourceActionWithHeaders(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionTestResource{}
+	r := VerifiedIDResourceActionTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -53,9 +53,9 @@ func TestAcc_ResourceActionWithHeaders(t *testing.T) {
 }
 
 func TestAcc_ResourceActionWithExportValues(t *testing.T) {
-	data := acceptance.BuildTestData(t, "msgraph_resource_action", "test")
+	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
 
-	r := MSGraphResourceActionTestResource{}
+	r := VerifiedIDResourceActionTestResource{}
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
@@ -67,16 +67,16 @@ func TestAcc_ResourceActionWithExportValues(t *testing.T) {
 	})
 }
 
-func (r MSGraphResourceActionTestResource) Exists(ctx context.Context, clients *clients.Client, state *terraform.InstanceState) (*bool, error) {
+func (r VerifiedIDResourceActionTestResource) Exists(ctx context.Context, clients *clients.Client, state *terraform.InstanceState) (*bool, error) {
 	exists := false
 	return &exists, nil
 }
 
-func (r MSGraphResourceActionTestResource) basic() string {
+func (r VerifiedIDResourceActionTestResource) basic() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -90,8 +90,8 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+resource "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   method       = "PATCH"
 
   body = {
@@ -101,11 +101,11 @@ resource "msgraph_resource_action" "test" {
 `
 }
 
-func (r MSGraphResourceActionTestResource) withQueryParams() string {
+func (r VerifiedIDResourceActionTestResource) withQueryParams() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -119,8 +119,8 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+resource "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   method       = "PATCH"
 
   query_parameters = {
@@ -134,11 +134,11 @@ resource "msgraph_resource_action" "test" {
 `
 }
 
-func (r MSGraphResourceActionTestResource) withHeaders() string {
+func (r VerifiedIDResourceActionTestResource) withHeaders() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -152,8 +152,8 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+resource "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   method       = "PATCH"
 
   headers = {
@@ -168,11 +168,11 @@ resource "msgraph_resource_action" "test" {
 `
 }
 
-func (r MSGraphResourceActionTestResource) withExportValues() string {
+func (r VerifiedIDResourceActionTestResource) withExportValues() string {
 	return `
 provider "msgraph" {}
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "Test Group"
@@ -186,8 +186,8 @@ resource "msgraph_resource" "group" {
   }
 }
 
-resource "msgraph_resource_action" "test" {
-  resource_url = msgraph_resource.group.resource_url
+resource "verifiedid_resource_action" "test" {
+  resource_url = verifiedid_resource.group.resource_url
   method       = "PATCH"
 
   body = {

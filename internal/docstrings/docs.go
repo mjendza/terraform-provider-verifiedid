@@ -22,7 +22,7 @@ func Url(kind string) string {
 	- Remove a reference to a resource: DELETE "/groups/{group-id}/members/{id}/$ref"
   
   More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).  
-  And there are some [examples](https://github.com/microsoft/terraform-provider-msgraph/tree/main/examples/quickstarts) to help you get started.
+  And there are some [examples](https://github.com/mjendza/terraform-provider-verifiedid/tree/main/examples/quickstarts) to help you get started.
 `
 	case "update_resource":
 		return `The item URL of the existing resource to update, for example "/users/{id}".
@@ -32,7 +32,7 @@ func Url(kind string) string {
 		- Update an existing resource: PATCH "/users/{id}"
 
 	More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).  
-	There are also [examples](https://github.com/microsoft/terraform-provider-msgraph/tree/main/examples/quickstarts) to help you get started.`
+	There are also [examples](https://github.com/mjendza/terraform-provider-verifiedid/tree/main/examples/quickstarts) to help you get started.`
 	default:
 		return ""
 	}
