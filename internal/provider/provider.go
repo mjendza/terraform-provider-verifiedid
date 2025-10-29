@@ -433,17 +433,17 @@ func (p *VerifiedIDProvider) Configure(ctx context.Context, req provider.Configu
 
 func (p *VerifiedIDProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		services.NewMSGraphResource,
-		services.NewMSGraphResourceAction,
-		services.NewMSGraphUpdateResource,
-		services.NewMSGraphResourceCollection,
+		services.NewVerifiedIDResource,
+		services.NewVerifiedIDResourceAction,
+		services.NewVerifiedIDUpdateResource,
+		services.NewVerifiedIDResourceCollection,
 	}
 }
 
 func (p *VerifiedIDProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		services.NewMSGraphDataSource,
-		services.NewMSGraphResourceActionDataSource,
+		services.NewVerifiedIDDataSource,
+		services.NewVerifiedIDResourceActionDataSource,
 	}
 }
 
