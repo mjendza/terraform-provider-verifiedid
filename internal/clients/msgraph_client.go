@@ -27,7 +27,7 @@ func NewMSGraphClient(credential azcore.TokenCredential, opt *policy.ClientOptio
 		APIVersion:             runtime.APIVersionOptions{},
 		PerCall:                nil,
 		PerRetry: []policy.Policy{
-			runtime.NewBearerTokenPolicy(credential, []string{"6a8b4b39-c021-437c-b060-5a14a3fd65f3"}, nil),
+			runtime.NewBearerTokenPolicy(credential, []string{"6a8b4b39-c021-437c-b060-5a14a3fd65f3/.default"}, nil),
 		},
 		Tracing: runtime.TracingOptions{},
 	}, opt)
