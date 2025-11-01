@@ -58,6 +58,7 @@ type VerifiedIDResourceModel struct {
 	Url                   types.String      `tfsdk:"url"`
 	Body                  types.Dynamic     `tfsdk:"body"`
 	IgnoreMissingProperty types.Bool        `tfsdk:"ignore_missing_property"`
+	PatchAsFullBody       types.Bool        `tfsdk:"patch_as_full_body"`
 	CreateQueryParameters types.Map         `tfsdk:"create_query_parameters"`
 	UpdateQueryParameters types.Map         `tfsdk:"update_query_parameters"`
 	ReadQueryParameters   types.Map         `tfsdk:"read_query_parameters"`
@@ -111,6 +112,13 @@ func (r *VerifiedIDResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Optional:            true,
 				Computed:            true,
 				Default:             booldefault.StaticBool(true),
+			},
+
+			"patch_as_full_body": schema.BoolAttribute{
+				MarkdownDescription: "When set to `true`, the PATCH request will use the full body from Terraform state instead of only the changed properties. Defaults to `false`.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
 			},
 
 			"create_query_parameters": schema.MapAttribute{
@@ -304,20 +312,30 @@ func (r *VerifiedIDResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	diffOption := utils.UpdateJsonOption{
-		IgnoreCasing:          false,
-		IgnoreMissingProperty: false,
-		IgnoreNullProperty:    false,
+	var bodyToUpdate interface{}
+	
+	// Determine which body to use for the PATCH request
+	if model.PatchAsFullBody.ValueBool() {
+		// Use the full body from Terraform state
+		bodyToUpdate = requestBody
+		tflog.Info(ctx, "Using full body for PATCH request (patch_as_full_body=true)")
+	} else {
+		// Calculate the diff and use only changed properties
+		diffOption := utils.UpdateJsonOption{
+			IgnoreCasing:          false,
+			IgnoreMissingProperty: false,
+			IgnoreNullProperty:    false,
+		}
+		bodyToUpdate = utils.DiffObject(previousBody, requestBody, diffOption)
 	}
-	patchBody := utils.DiffObject(previousBody, requestBody, diffOption)
 
 	// If there's something to update, send PATCH
-	if !utils.IsEmptyObject(patchBody) {
+	if !utils.IsEmptyObject(bodyToUpdate) {
 		options := clients.RequestOptions{
 			QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.UpdateQueryParameters)),
 			RetryOptions:    clients.NewRetryOptions(model.Retry),
 		}
-		_, err := r.client.Update(ctx, fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString()), model.ApiVersion.ValueString(), patchBody, options)
+		_, err := r.client.Update(ctx, fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString()), model.ApiVersion.ValueString(), bodyToUpdate, options)
 		if err != nil {
 			resp.Diagnostics.AddError("Failed to create resource", err.Error())
 			return
@@ -479,6 +497,7 @@ func (r *VerifiedIDResource) ImportState(ctx context.Context, req resource.Impor
 		Url:                   types.StringValue(urlValue),
 		ApiVersion:            types.StringValue(apiVersion),
 		IgnoreMissingProperty: types.BoolValue(true),
+		PatchAsFullBody:       types.BoolValue(false),
 		CreateQueryParameters: types.MapNull(types.ListType{ElemType: types.StringType}),
 		UpdateQueryParameters: types.MapNull(types.ListType{ElemType: types.StringType}),
 		ReadQueryParameters:   types.MapNull(types.ListType{ElemType: types.StringType}),
