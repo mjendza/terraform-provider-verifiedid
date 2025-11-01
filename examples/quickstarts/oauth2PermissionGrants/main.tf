@@ -1,12 +1,12 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
 locals {
@@ -14,10 +14,10 @@ locals {
 
 
   # ServicePrincipal
-  MSGraphServicePrincipalId = data.msgraph_resource.servicePrincipal_msgraph.output.all.value[0].id
+  MSGraphServicePrincipalId = data.verifiedid_resource.servicePrincipal_msgraph.output.all.value[0].id
 }
 
-data "msgraph_resource" "servicePrincipal_msgraph" {
+data "verifiedid_resource" "servicePrincipal_msgraph" {
   url = "servicePrincipals"
   query_parameters = {
     "$filter" = ["appId eq '${local.MicrosoftGraphAppId}'"]
@@ -27,7 +27,7 @@ data "msgraph_resource" "servicePrincipal_msgraph" {
   }
 }
 
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "My Application"
@@ -37,17 +37,17 @@ resource "msgraph_resource" "application" {
   }
 }
 
-resource "msgraph_resource" "servicePrincipal_application" {
+resource "verifiedid_resource" "servicePrincipal_application" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application.output.appId
+    appId = verifiedid_resource.application.output.appId
   }
 }
 
-resource "msgraph_resource" "oauth2PermissionGrant" {
+resource "verifiedid_resource" "oauth2PermissionGrant" {
   url = "oauth2PermissionGrants"
   body = {
-    clientId    = msgraph_resource.servicePrincipal_application.id
+    clientId    = verifiedid_resource.servicePrincipal_application.id
     consentType = "AllPrincipals"
     resourceId  = local.MSGraphServicePrincipalId
     scope       = "User.Read"

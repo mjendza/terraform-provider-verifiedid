@@ -37,7 +37,7 @@ func BuildTestClient() (*clients.Client, error) {
 			cloudConfig = cloud.AzurePublic
 		}
 
-		model := provider.MSGraphProviderModel{}
+		model := provider.VerifiedIDProviderModel{}
 
 		// set the defaults from environment variables
 		if v := os.Getenv("ARM_CLIENT_ID"); v != "" {

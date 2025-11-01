@@ -1,15 +1,15 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
-data "msgraph_resource" "domains" {
+data "verifiedid_resource" "domains" {
   url = "domains"
   response_export_values = {
     all = "@"
@@ -17,10 +17,10 @@ data "msgraph_resource" "domains" {
 }
 
 locals {
-  domain = one([for domain in data.msgraph_resource.domains.output.all.value : domain.id if domain.isInitial])
+  domain = one([for domain in data.verifiedid_resource.domains.output.all.value : domain.id if domain.isInitial])
 }
 
-resource "msgraph_resource" "user" {
+resource "verifiedid_resource" "user" {
   url = "users"
   body = {
     accountEnabled    = false

@@ -1,15 +1,15 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "Microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {}
+provider "verifiedid" {}
 
 # Example 1: Get user's member groups
-data "msgraph_resource_action" "user_member_groups" {
+data "verifiedid_resource_action" "user_member_groups" {
   resource_url = "users/john@example.com"
   action       = "getMemberGroups"
   method       = "POST"
@@ -24,7 +24,7 @@ data "msgraph_resource_action" "user_member_groups" {
 }
 
 # Example 2: Check group membership
-data "msgraph_resource_action" "check_membership" {
+data "verifiedid_resource_action" "check_membership" {
   resource_url = "users/john@example.com"
   action       = "checkMemberGroups"
   method       = "POST"
@@ -42,7 +42,7 @@ data "msgraph_resource_action" "check_membership" {
 }
 
 # Example 3: Get group members with query parameters
-data "msgraph_resource_action" "group_members" {
+data "verifiedid_resource_action" "group_members" {
   resource_url = "groups/{group-id}"
   action       = "members"
   method       = "GET"
@@ -64,7 +64,7 @@ data "msgraph_resource_action" "group_members" {
 }
 
 # Example 4: Get application service principal
-data "msgraph_resource_action" "app_service_principal" {
+data "verifiedid_resource_action" "app_service_principal" {
   resource_url = "applications/{application-id}"
   action       = "servicePrincipals"
   method       = "GET"
@@ -81,17 +81,17 @@ data "msgraph_resource_action" "app_service_principal" {
 
 # Output the results
 output "user_groups" {
-  value = data.msgraph_resource_action.user_member_groups.output.groups
+  value = data.verifiedid_resource_action.user_member_groups.output.groups
 }
 
 output "matched_groups" {
-  value = data.msgraph_resource_action.check_membership.output.matched_groups
+  value = data.verifiedid_resource_action.check_membership.output.matched_groups
 }
 
 output "group_members" {
-  value = data.msgraph_resource_action.group_members.output.members
+  value = data.verifiedid_resource_action.group_members.output.members
 }
 
 output "service_principal_id" {
-  value = data.msgraph_resource_action.app_service_principal.output.sp_id
+  value = data.verifiedid_resource_action.app_service_principal.output.sp_id
 }

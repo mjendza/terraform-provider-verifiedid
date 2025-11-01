@@ -1,12 +1,12 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "Microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
 variable "application_id" {
@@ -14,7 +14,7 @@ variable "application_id" {
   default = "00000000-0000-0000-0000-000000000000"
 }
 
-data "msgraph_resource" "application" {
+data "verifiedid_resource" "application" {
   url = "applications/${var.application_id}"
   response_export_values = {
     all          = "@"
@@ -24,10 +24,10 @@ data "msgraph_resource" "application" {
 
 output "display_name" {
   // it will output "John Doe"
-  value = data.msgraph_resource.application.output.display_name
+  value = data.verifiedid_resource.application.output.display_name
 }
 
 output "all" {
   // it will output the whole response
-  value = data.msgraph_resource.application.output.all
+  value = data.verifiedid_resource.application.output.all
 }

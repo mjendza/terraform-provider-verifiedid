@@ -1,19 +1,19 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
 locals {
   MicrosoftGraphAppId = "00000003-0000-0000-c000-000000000000"
 }
 
-data "msgraph_resource" "servicePrincipal_msgraph" {
+data "verifiedid_resource" "servicePrincipal_msgraph" {
   url = "servicePrincipals"
   query_parameters = {
     "$filter" = ["appId eq '${local.MicrosoftGraphAppId}'"]
@@ -23,7 +23,7 @@ data "msgraph_resource" "servicePrincipal_msgraph" {
   }
 }
 
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "My Application"
@@ -33,9 +33,9 @@ resource "msgraph_resource" "application" {
   }
 }
 
-resource "msgraph_resource" "servicePrincipal_application" {
+resource "verifiedid_resource" "servicePrincipal_application" {
   url = "servicePrincipals"
   body = {
-    appId = msgraph_resource.application.output.appId
+    appId = verifiedid_resource.application.output.appId
   }
 }

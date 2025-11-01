@@ -1,5 +1,6 @@
 *.dll
 *.exe
+terraform-provider-verifiedid
 .DS_Store
 example.tf
 terraform.tfplan
