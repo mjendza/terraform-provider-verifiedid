@@ -169,7 +169,7 @@ And here is an example of azure-pipelines.yml file:
   - task: AzureCLI@2
     displayName: Acc Tests with OIDC Token
     inputs:
-      azureSubscription: 'verifiedid-oidc-test' // Azure Service Connection ID
+      azureSubscription: '{service-connection-id}' // Azure Service Connection ID
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -209,14 +209,14 @@ And here is an example of azure-pipelines.yml file:
   - task: AzureCLI@2
     displayName: Acc Tests with OIDC Azure Pipeline
     inputs:
-      azureSubscription: 'verifiedid-oidc-test' // Azure Service Connection ID
+      azureSubscription: '{service-connection-id}' // Azure Service Connection ID
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
         $env:ARM_TENANT_ID = $env:tenantId
         $env:ARM_CLIENT_ID = $env:servicePrincipalId
         $env:ARM_OIDC_REQUEST_TOKEN = "$(System.AccessToken)"
-        $env:ARM_OIDC_AZURE_SERVICE_CONNECTION_ID = "verifiedid-oidc-test"
+        $env:ARM_OIDC_AZURE_SERVICE_CONNECTION_ID = "{service-connection-id}"
         $env:ARM_USE_OIDC = 'true'
         terraform plan
       addSpnToEnvironment: true
