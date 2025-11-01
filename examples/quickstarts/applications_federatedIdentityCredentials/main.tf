@@ -1,24 +1,24 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "My Application"
   }
 }
 
-resource "msgraph_resource" "federatedIdentityCredential" {
+resource "verifiedid_resource" "federatedIdentityCredential" {
   # url = "applications/{id}/federatedIdentityCredentials"
-  url = "applications/${msgraph_resource.application.id}/federatedIdentityCredentials"
+  url = "applications/${verifiedid_resource.application.id}/federatedIdentityCredentials"
   body = {
     name        = "myFederatedIdentityCredentials"
     description = "My test federated identity credentials"

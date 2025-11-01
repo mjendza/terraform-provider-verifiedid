@@ -1,31 +1,31 @@
 ---
-layout: "msgraph"
-page_title: "Provider: MSGraph API"
+layout: "verifiedid"
+page_title: "Provider: Verified ID"
 description: |-
-  The MSGraph Provider is used to interact with the many resources supported by Microsoft Graph through its APIs.
+  The Verified ID Provider is used to interact with Microsoft Entra Verified ID through Microsoft Graph APIs.
 ---
 
-# MSGraph Provider
+# Verified ID Provider
 
-The MSGraph provider is a very thin layer on top of the MSGraph REST APIs. 
+The Verified ID provider is a fork of the MSGraph provider, specifically focused on Microsoft Entra Verified ID management. 
 
-Documentation regarding the [Data Sources](/docs/configuration/data-sources.html) and [Resources](/docs/configuration/resources.html) supported by the MSGraph Provider can be found in the navigation to the left.
+Documentation regarding the [Data Sources](/docs/configuration/data-sources.html) and [Resources](/docs/configuration/resources.html) supported by the Verified ID Provider can be found in the navigation to the left.
 
-Interested in the provider's latest features, or want to make sure you're up to date? Check out the [changelog](https://github.com/Microsoft/terraform-provider-msgraph/blob/main/CHANGELOG.md) for version information and release notes.
+Interested in the provider's latest features, or want to make sure you're up to date? Check out the [changelog](https://github.com/mjendza/terraform-provider-verifiedid/blob/main/CHANGELOG.md) for version information and release notes.
 
-Strongly recommended to install [Microsoft Terraform VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureterraform), it provides a rich authoring experience to help you use the MSGraph provider.
+This is a fork from [terraform-provider-msgraph](https://github.com/microsoft/terraform-provider-msgraph).
 
-Also, there is a rich library of [examples](https://github.com/Microsoft/terraform-provider-msgraph/tree/main/examples) to help you get started.
+Also, there is a rich library of [examples](https://github.com/mjendza/terraform-provider-verifiedid/tree/main/examples) to help you get started.
 
-## Authenticating to MSGraph
+## Authenticating to Microsoft Graph
 
 Terraform supports a number of different methods for authenticating to Azure:
 
-* [Authenticating to MSGraph using the Azure CLI](guides/azure_cli.html)
-* [Authenticating to MSGraph using Managed Service Identity](guides/managed_service_identity.html)
-* [Authenticating to MSGraph using a Service Principal and a Client Certificate](guides/service_principal_client_certificate.html)
-* [Authenticating to MSGraph using a Service Principal and a Client Secret](guides/service_principal_client_secret.html)
-* [Authenticating to MSGraph using OpenID Connect](guides/service_principal_oidc.html)
+* [Authenticating using the Azure CLI](guides/azure_cli.html)
+* [Authenticating using Managed Service Identity](guides/managed_service_identity.html)
+* [Authenticating using a Service Principal and a Client Certificate](guides/service_principal_client_certificate.html)
+* [Authenticating using a Service Principal and a Client Secret](guides/service_principal_client_secret.html)
+* [Authenticating using OpenID Connect](guides/service_principal_oidc.html)
 
 ---
 
@@ -35,16 +35,16 @@ We recommend using either a Service Principal or Managed Service Identity when r
 
 ```hcl
 # We strongly recommend using the required_providers block to set the
-# Azure Provider source and version being used
+# Verified ID Provider source and version being used
 terraform {
   required_providers {
-    msgraph = {
-      source = "microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
 ```

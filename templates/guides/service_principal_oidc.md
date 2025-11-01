@@ -124,7 +124,7 @@ The following Terraform and Provider blocks can be specified - where `0.1.0` is 
 ```hcl
 terraform {
   required_providers {
-    msgraph = {
+    verifiedid = {
       source  = "mjendza/verifiedid"
       version = "=0.1.0"
     }
@@ -147,7 +147,7 @@ Here is an example of how to specify the OIDC token using the `oidc_token` provi
 ```hcl
 terraform {
   required_providers {
-    msgraph = {
+    verifiedid = {
       source = "mjendza/verifiedid"
     }
   }
@@ -169,7 +169,7 @@ And here is an example of azure-pipelines.yml file:
   - task: AzureCLI@2
     displayName: Acc Tests with OIDC Token
     inputs:
-      azureSubscription: 'msgraph-oidc-test' // Azure Service Connection ID
+      azureSubscription: 'verifiedid-oidc-test' // Azure Service Connection ID
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -190,7 +190,7 @@ Here is an example of how to specify the OIDC request token and URL using the `o
 ```hcl
 terraform {
   required_providers {
-    msgraph = {
+    verifiedid = {
       source  = "mjendza/verifiedid"
     }
   }
@@ -209,14 +209,14 @@ And here is an example of azure-pipelines.yml file:
   - task: AzureCLI@2
     displayName: Acc Tests with OIDC Azure Pipeline
     inputs:
-      azureSubscription: 'msgraph-oidc-test' // Azure Service Connection ID
+      azureSubscription: 'verifiedid-oidc-test' // Azure Service Connection ID
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
         $env:ARM_TENANT_ID = $env:tenantId
         $env:ARM_CLIENT_ID = $env:servicePrincipalId
         $env:ARM_OIDC_REQUEST_TOKEN = "$(System.AccessToken)"
-        $env:ARM_OIDC_AZURE_SERVICE_CONNECTION_ID = "msgraph-oidc-test"
+        $env:ARM_OIDC_AZURE_SERVICE_CONNECTION_ID = "verifiedid-oidc-test"
         $env:ARM_USE_OIDC = 'true'
         terraform plan
       addSpnToEnvironment: true
@@ -240,7 +240,7 @@ variable "oidc_request_url" {}
 
 terraform {
   required_providers {
-    msgraph = {
+    verifiedid = {
       source  = "mjendza/verifiedid"
       version = "=1.3.0"
     }

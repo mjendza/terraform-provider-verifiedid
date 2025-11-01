@@ -1,15 +1,15 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
-resource "msgraph_resource" "group" {
+resource "verifiedid_resource" "group" {
   url = "groups"
   body = {
     displayName     = "My Group"
