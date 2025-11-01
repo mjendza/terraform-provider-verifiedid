@@ -1,9 +1,9 @@
 ---
-layout: "msgraph"
-page_title: "MSGraph Provider: Authenticating via a Service Principal and a Client Secret"
+layout: "verifiedid"
+page_title: "Verified ID Provider: Authenticating via a Service Principal and a Client Secret"
 subcategory: "Authentication"
 description: |-
-  This guide will cover how to use a Service Principal (Shared Account) with a Client Secret as authentication for the MSGraph Provider.
+  This guide will cover how to use a Service Principal (Shared Account) with a Client Secret as authentication for the Verified ID Provider.
 ---
 
 # Authenticating using a Service Principal with a Client Secret
@@ -86,7 +86,7 @@ It's also possible to configure these variables either directly, or from variabl
 ```terraform
 variable "client_secret" {}
 
-provider "msgraph" {
+provider "verifiedid" {
   client_id     = "00000000-0000-0000-0000-000000000000"
   client_secret = var.client_secret
   tenant_id     = "10000000-2000-3000-4000-500000000000"

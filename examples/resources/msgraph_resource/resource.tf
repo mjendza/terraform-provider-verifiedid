@@ -1,15 +1,15 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "Microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
 }
 
-resource "msgraph_resource" "application" {
+resource "verifiedid_resource" "application" {
   url = "applications"
   body = {
     displayName = "My Application"
@@ -21,15 +21,15 @@ resource "msgraph_resource" "application" {
 }
 
 output "app_id" {
-  value = msgraph_resource.application.output.app_id
+  value = verifiedid_resource.application.output.app_id
 }
 
 output "all" {
   // it will output the whole response
-  value = msgraph_resource.application.output.all
+  value = verifiedid_resource.application.output.all
 }
 
 output "resource_url" {
   // it will output something like "applications/12345678-1234-1234-1234-123456789abc"
-  value = msgraph_resource.application.resource_url
+  value = verifiedid_resource.application.resource_url
 }

@@ -1,9 +1,9 @@
 ---
-layout: "msgraph"
-page_title: "MSGraph Provider: Authenticating via a Service Principal and OpenID Connect"
+layout: "verifiedid"
+page_title: "Verified ID Provider: Authenticating via a Service Principal and OpenID Connect"
 subcategory: "Authentication"
 description: |-
-  This guide will cover how to use a Service Principal (Shared Account) with OpenID Connect as authentication for the MSGraph Provider.
+  This guide will cover how to use a Service Principal (Shared Account) with OpenID Connect as authentication for the Verified ID Provider.
 ---
 
 # Authenticating using a Service Principal and OpenID Connect
@@ -119,19 +119,19 @@ permissions:
 
 For more information about OIDC in GitHub Actions, see [official documentation](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers).
 
-The following Terraform and Provider blocks can be specified - where `0.1.0` is the version of the MSGraph Provider that you'd like to use:
+The following Terraform and Provider blocks can be specified - where `0.1.0` is the version of the Verified ID Provider that you'd like to use:
 
 ```hcl
 terraform {
   required_providers {
     msgraph = {
-      source  = "microsoft/msgraph"
+      source  = "mjendza/verifiedid"
       version = "=0.1.0"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   use_oidc = true
 }
 ```
@@ -148,12 +148,12 @@ Here is an example of how to specify the OIDC token using the `oidc_token` provi
 terraform {
   required_providers {
     msgraph = {
-      source = "azure/msgraph"
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   oidc_token = "{OIDC Token}"
 
   // or use oidc_token_file_path
@@ -191,12 +191,12 @@ Here is an example of how to specify the OIDC request token and URL using the `o
 terraform {
   required_providers {
     msgraph = {
-      source = "microsoft/msgraph"
+      source  = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   oidc_request_token               = "{OIDC Request Token}"
   oidc_azure_service_connection_id = "{Azure Service Connection ID}"
   use_oidc                         = true
@@ -241,13 +241,13 @@ variable "oidc_request_url" {}
 terraform {
   required_providers {
     msgraph = {
-      source  = "microsoft/msgraph"
+      source  = "mjendza/verifiedid"
       version = "=1.3.0"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   features {}
 
   subscription_id = "00000000-0000-0000-0000-000000000000"

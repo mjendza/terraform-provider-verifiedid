@@ -1,6 +1,6 @@
 ---
-layout: "msgraph"
-page_title: "MSGraph Provider: Configuring a User or Service Principal to manage Azure Active Directory"
+layout: "verifiedid"
+page_title: "Verified ID Provider: Configuring a User or Service Principal to manage Azure Active Directory"
 subcategory: "Authentication"
 ---
 

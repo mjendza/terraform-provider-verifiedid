@@ -1,15 +1,15 @@
 terraform {
   required_providers {
-    msgraph = {
-      source = "Microsoft/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {}
+provider "verifiedid" {}
 
 # Example 1: Send a welcome email to a user
-resource "msgraph_resource_action" "send_welcome_email" {
+resource "verifiedid_resource_action" "send_welcome_email" {
   resource_url = "users/john@example.com"
   action       = "sendMail"
   method       = "POST"
@@ -35,7 +35,7 @@ resource "msgraph_resource_action" "send_welcome_email" {
 }
 
 # Example 2: Reset a user's password
-resource "msgraph_resource_action" "reset_user_password" {
+resource "verifiedid_resource_action" "reset_user_password" {
   resource_url = "users/jane@example.com"
   action       = "changePassword"
   method       = "POST"
@@ -47,7 +47,7 @@ resource "msgraph_resource_action" "reset_user_password" {
 }
 
 # Example 3: Send a custom notification with specific headers
-resource "msgraph_resource_action" "send_notification" {
+resource "verifiedid_resource_action" "send_notification" {
   resource_url = "communications/calls"
   action       = "logTeleconferenceDeviceQuality"
   method       = "POST"
@@ -65,7 +65,7 @@ resource "msgraph_resource_action" "send_notification" {
   }
 }
 
-resource "msgraph_resource_action" "custom_user_action" {
+resource "verifiedid_resource_action" "custom_user_action" {
   resource_url = "users/john@example.com"
   action       = "customAction"
   method       = "POST"
@@ -104,13 +104,13 @@ resource "msgraph_resource_action" "custom_user_action" {
 
 # Output the results
 output "welcome_email_sent" {
-  value = msgraph_resource_action.send_welcome_email.output
+  value = verifiedid_resource_action.send_welcome_email.output
 }
 
 output "notification_sent" {
-  value = msgraph_resource_action.send_notification.output
+  value = verifiedid_resource_action.send_notification.output
 }
 
 output "custom_action_result" {
-  value = msgraph_resource_action.custom_user_action.output
+  value = verifiedid_resource_action.custom_user_action.output
 }
