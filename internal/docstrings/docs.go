@@ -49,12 +49,12 @@ The output HCL object containing the properties specified in %[1]sresponse_expor
 	%[1]s%[1]s%[1]sterraform
 	 output "app_id" {
 	   // it will output the value of app_id
-	   value = msgraph_resource.application.output.app_id
+	   value = verifiedid_resource.application.output.app_id
 	 }
 	 
 	 output "all" {
 	   // it will output the whole response
-	   value = msgraph_resource.application.output.all
+	   value = verifiedid_resource.application.output.all
 	 }
 	%[1]s%[1]s%[1]s`, "`")
 }

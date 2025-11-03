@@ -1,9 +1,9 @@
 ---
-layout: "msgraph"
-page_title: "MSGraph Provider: Authenticating via a Service Principal and a Client Certificate"
+layout: "verifiedid"
+page_title: "Verified ID Provider: Authenticating via a Service Principal and a Client Certificate"
 subcategory: "Authentication"
 description: |-
-  This guide will cover how to use a Service Principal (Shared Account) with a Client Certificate as authentication for the MSGraph Provider.
+  This guide will cover how to use a Service Principal (Shared Account) with a Client Certificate as authentication for the Verified ID Provider.
 ---
 
 # Authenticating using a Service Principal with a Client Certificate
@@ -136,7 +136,7 @@ It's also possible to configure these variables either directly, or from variabl
 variable "client_certificate_path" {}
 variable "client_certificate_password" {}
 
-provider "msgraph" {
+provider "verifiedid" {
   client_id                   = "00000000-0000-0000-0000-000000000000"
   client_certificate_path     = var.client_certificate_path
   client_certificate_password = var.client_certificate_password
@@ -149,7 +149,7 @@ provider "msgraph" {
 variable "client_certificate" {}
 variable "client_certificate_password" {}
 
-provider "msgraph" {
+provider "verifiedid" {
   client_id                   = "00000000-0000-0000-0000-000000000000"
   client_certificate          = var.client_certificate
   client_certificate_password = var.client_certificate_password

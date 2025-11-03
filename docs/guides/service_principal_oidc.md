@@ -1,9 +1,9 @@
 ---
-layout: "msgraph"
-page_title: "MSGraph Provider: Authenticating via a Service Principal and OpenID Connect"
+layout: "verifiedid"
+page_title: "Verified ID Provider: Authenticating via a Service Principal and OpenID Connect"
 subcategory: "Authentication"
 description: |-
-  This guide will cover how to use a Service Principal (Shared Account) with OpenID Connect as authentication for the MSGraph Provider.
+  This guide will cover how to use a Service Principal (Shared Account) with OpenID Connect as authentication for the Verified ID Provider.
 ---
 
 # Authenticating using a Service Principal and OpenID Connect
@@ -119,19 +119,19 @@ permissions:
 
 For more information about OIDC in GitHub Actions, see [official documentation](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers).
 
-The following Terraform and Provider blocks can be specified - where `0.1.0` is the version of the MSGraph Provider that you'd like to use:
+The following Terraform and Provider blocks can be specified - where `0.1.0` is the version of the Verified ID Provider that you'd like to use:
 
 ```hcl
 terraform {
   required_providers {
-    msgraph = {
-      source  = "microsoft/msgraph"
+    verifiedid = {
+      source  = "mjendza/verifiedid"
       version = "=0.1.0"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   use_oidc = true
 }
 ```
@@ -147,13 +147,13 @@ Here is an example of how to specify the OIDC token using the `oidc_token` provi
 ```hcl
 terraform {
   required_providers {
-    msgraph = {
-      source = "azure/msgraph"
+    verifiedid = {
+      source = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   oidc_token = "{OIDC Token}"
 
   // or use oidc_token_file_path
@@ -169,7 +169,7 @@ And here is an example of azure-pipelines.yml file:
   - task: AzureCLI@2
     displayName: Acc Tests with OIDC Token
     inputs:
-      azureSubscription: 'msgraph-oidc-test' // Azure Service Connection ID
+      azureSubscription: '{service-connection-id}' // Azure Service Connection ID
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -190,13 +190,13 @@ Here is an example of how to specify the OIDC request token and URL using the `o
 ```hcl
 terraform {
   required_providers {
-    msgraph = {
-      source = "microsoft/msgraph"
+    verifiedid = {
+      source  = "mjendza/verifiedid"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   oidc_request_token               = "{OIDC Request Token}"
   oidc_azure_service_connection_id = "{Azure Service Connection ID}"
   use_oidc                         = true
@@ -209,14 +209,14 @@ And here is an example of azure-pipelines.yml file:
   - task: AzureCLI@2
     displayName: Acc Tests with OIDC Azure Pipeline
     inputs:
-      azureSubscription: 'msgraph-oidc-test' // Azure Service Connection ID
+      azureSubscription: '{service-connection-id}' // Azure Service Connection ID
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
         $env:ARM_TENANT_ID = $env:tenantId
         $env:ARM_CLIENT_ID = $env:servicePrincipalId
         $env:ARM_OIDC_REQUEST_TOKEN = "$(System.AccessToken)"
-        $env:ARM_OIDC_AZURE_SERVICE_CONNECTION_ID = "msgraph-oidc-test"
+        $env:ARM_OIDC_AZURE_SERVICE_CONNECTION_ID = "{service-connection-id}"
         $env:ARM_USE_OIDC = 'true'
         terraform plan
       addSpnToEnvironment: true
@@ -240,14 +240,14 @@ variable "oidc_request_url" {}
 
 terraform {
   required_providers {
-    msgraph = {
-      source  = "microsoft/msgraph"
+    verifiedid = {
+      source  = "mjendza/verifiedid"
       version = "=1.3.0"
     }
   }
 }
 
-provider "msgraph" {
+provider "verifiedid" {
   features {}
 
   subscription_id = "00000000-0000-0000-0000-000000000000"

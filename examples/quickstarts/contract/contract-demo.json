@@ -1,0 +1,64 @@
+{
+    "name": "DemoCertificate01",
+    "rules": {
+        "attestations": {
+            "idTokenHints": [
+                {
+                    "mapping": [
+                        {
+                            "outputClaim": "certNumber",
+                            "required": true,
+                            "inputClaim": "certNumber",
+                            "indexed": false
+                        }
+                    ],
+                    "required": true
+                }
+            ],
+            "selfIssued": {
+                "mapping": [
+                    {
+                        "outputClaim": "displayName",
+                        "required": true,
+                        "inputClaim": "displayName",
+                        "indexed": false
+                    }
+                ],
+                "required": true
+            }
+        },
+        "validityInterval": 2592000,
+        "vc": {
+            "type": [
+                "Demo01"
+            ]
+        }
+    },
+    "displays": [
+        {
+            "locale": "en-US",
+            "card": {
+                "backgroundColor": "#BDD0A7",
+                "description": "Demo 01 Verified ID",
+                "issuedBy": "__YOUR_ISSUER_NAME_HERE__",
+                "textColor": "#000000",
+                "title": "For Demo 01 Title",
+                "logo": {
+                    "description": "LogoDescription",
+                    "uri": "___YOUR_LOGO_URI_HERE___"
+                }
+            },
+            "consent": {
+                "instructions": "TODO",
+                "title": "Share Demo 01 Credentials"
+            },
+            "claims": [
+                {
+                    "claim": "vc.credentialSubject.certNumber",
+                    "label": "Certificate Number",
+                    "type": "String"
+                }
+            ]
+        }
+    ]
+}

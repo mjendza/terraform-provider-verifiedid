@@ -1,9 +1,9 @@
 ---
-layout: "msgraph"
-page_title: "MSGraph Provider: Authenticating via the Azure CLI"
+layout: "verifiedid"
+page_title: "Verified ID Provider: Authenticating via the Azure CLI"
 subcategory: "Authentication"
 description: |-
-  This guide will cover how to use the Azure CLI as authentication for the MSGraph Provider.
+  This guide will cover how to use the Azure CLI as authentication for the Verified ID Provider.
 
 ---
 
@@ -118,7 +118,7 @@ $env:ARM_TENANT_ID = 00000000-0000-2222-2222-222222222222
 You can also configure the tenant ID from within the provider block.
 
 ```hcl
-provider "msgraph" {
+provider "verifiedid" {
   tenant_id = "00000000-0000-2222-2222-222222222222"
 }
 ```
@@ -131,7 +131,7 @@ $ az login --allow-no-subscriptions --tenant "TENANT_ID_OR_DOMAIN"
 
 <br>
 
--> **Tenants and Subscriptions** The MSGraph provider operates on tenants and not on subscriptions. We recommend always specifying `az login --allow-no-subscriptions` as it will force the Azure CLI to report tenants with no associated subscriptions, or where your user account does not have any roles assigned for a subscription.
+-> **Tenants and Subscriptions** The Verified ID provider operates on tenants and not on subscriptions. We recommend always specifying `az login --allow-no-subscriptions` as it will force the Azure CLI to report tenants with no associated subscriptions, or where your user account does not have any roles assigned for a subscription.
 
 ---
 
@@ -140,7 +140,7 @@ $ az login --allow-no-subscriptions --tenant "TENANT_ID_OR_DOMAIN"
 No specific configuration is required for the provider to use Azure CLI authentication. If you're looking to use Terraform across Tenants - it's possible to do this by configuring the `tenant_id` field in the Provider block, as shown below:
 
 ```hcl
-provider "msgraph" {
+provider "verifiedid" {
   tenant_id = "00000000-0000-1111-1111-111111111111"
 }
 ```
@@ -156,7 +156,7 @@ For compatibility reasons and to ensure a positive user experience when running 
 To do so, add the `use_cli` configuration property in the Provider block.
 
 ```hcl
-provider "msgraph" {
+provider "verifiedid" {
   use_cli = false
 }
 ```
