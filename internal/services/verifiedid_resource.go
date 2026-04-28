@@ -444,12 +444,12 @@ func (r *VerifiedIDResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	options := clients.RequestOptions{
-		QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.DeleteQueryParameters)),
+		QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.UpdateQueryParameters)),
 		RetryOptions:    clients.NewRetryOptions(model.Retry),
 	}
-	err := r.client.Delete(ctx, itemUrl, model.ApiVersion.ValueString(), options)
-	if err != nil {
-		resp.Diagnostics.AddError("Failed to delete resource", err.Error())
+	disableBody := map[string]interface{}{"status": "Disabled"}
+	if _, err := r.client.Update(ctx, itemUrl, model.ApiVersion.ValueString(), disableBody, options); err != nil {
+		resp.Diagnostics.AddError("Failed to disable resource", err.Error())
 		return
 	}
 }

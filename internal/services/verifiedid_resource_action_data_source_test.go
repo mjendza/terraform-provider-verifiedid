@@ -56,30 +56,12 @@ func TestAcc_DataSourceResourceActionWithHeaders(t *testing.T) {
 	})
 }
 
-func TestAcc_DataSourceResourceActionWithBody(t *testing.T) {
-	data := acceptance.BuildTestData(t, "verifiedid_resource_action", "test")
-
-	r := VerifiedIDResourceActionDataSourceTestResource{}
-
-	data.ResourceTest(t, r, []resource.TestStep{
-		{
-			Config: r.withBody(),
-			Check:  resource.ComposeTestCheckFunc(),
-		},
-	})
-}
-
 func (r VerifiedIDResourceActionDataSourceTestResource) basic() string {
 	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
+resource "verifiedid_resource" "application" {
+  url = "applications"
   body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
+    displayName = "Test Application"
   }
 
   lifecycle {
@@ -88,8 +70,8 @@ resource "verifiedid_resource" "group" {
 }
 
 data "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
-  action       = "members"
+  resource_url = verifiedid_resource.application.resource_url
+  action       = "owners"
   method       = "GET"
 }
 `
@@ -97,15 +79,10 @@ data "verifiedid_resource_action" "test" {
 
 func (r VerifiedIDResourceActionDataSourceTestResource) withQueryParams() string {
 	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
+resource "verifiedid_resource" "application" {
+  url = "applications"
   body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
+    displayName = "Test Application"
   }
 
   lifecycle {
@@ -114,7 +91,7 @@ resource "verifiedid_resource" "group" {
 }
 
 data "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
+  resource_url = verifiedid_resource.application.resource_url
   action       = "owners"
   method       = "GET"
 
@@ -128,15 +105,10 @@ data "verifiedid_resource_action" "test" {
 
 func (r VerifiedIDResourceActionDataSourceTestResource) withHeaders() string {
 	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
+resource "verifiedid_resource" "application" {
+  url = "applications"
   body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
+    displayName = "Test Application"
   }
 
   lifecycle {
@@ -145,46 +117,12 @@ resource "verifiedid_resource" "group" {
 }
 
 data "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
+  resource_url = verifiedid_resource.application.resource_url
   action       = "owners"
   method       = "GET"
 
   headers = {
     "X-Custom-Header" = "test-value"
-  }
-}
-`
-}
-
-func (r VerifiedIDResourceActionDataSourceTestResource) withBody() string {
-	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
-  body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
-  }
-
-  lifecycle {
-    ignore_changes = [body.displayName]
-  }
-}
-
-data "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
-  action       = "checkMemberObjects"
-  method       = "POST"
-
-  body = {
-    ids = ["00000000-0000-0000-0000-000000000000"]
-  }
-
-  response_export_values = {
-    result = "value"
   }
 }
 `

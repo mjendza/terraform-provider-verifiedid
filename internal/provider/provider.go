@@ -436,7 +436,6 @@ func (p *VerifiedIDProvider) Resources(ctx context.Context) []func() resource.Re
 		services.NewVerifiedIDResource,
 		services.NewVerifiedIDResourceAction,
 		services.NewVerifiedIDUpdateResource,
-		services.NewVerifiedIDResourceCollection,
 	}
 }
 

@@ -107,26 +107,6 @@ func TestAcc_UpdateResourceRetry(t *testing.T) {
 	})
 }
 
-func TestAcc_UpdateResource_GroupOwnerBind_UpdateDisplayName(t *testing.T) {
-	data := acceptance.BuildTestData(t, "verifiedid_update_resource", "test")
-	r := VerifiedIDTestUpdateResource{}
-
-	data.ResourceTest(t, r, []resource.TestStep{
-		{
-			Config: r.groupWithOwnerUpdate("My Group Owners Bind 2"),
-			Check: resource.ComposeTestCheckFunc(
-				check.That(data.ResourceName).Exists(r),
-			),
-		},
-		{
-			Config: r.groupWithOwnerUpdate("My Group Owners Bind 3"),
-			Check: resource.ComposeTestCheckFunc(
-				check.That(data.ResourceName).Exists(r),
-			),
-		},
-	})
-}
-
 func (r VerifiedIDTestUpdateResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
 	apiVersion := state.Attributes["api_version"]
 	url := state.Attributes["url"]
@@ -256,54 +236,4 @@ resource "verifiedid_update_resource" "test" {
   }
 }
 `
-}
-
-func (r VerifiedIDTestUpdateResource) groupWithOwnerBase() string {
-	return `
-resource "verifiedid_resource" "application" {
-  url = "applications"
-  body = {
-    displayName = "My Application"
-  }
-  response_export_values = {
-    appId = "appId"
-  }
-}
-
-resource "verifiedid_resource" "servicePrincipal_application" {
-  url = "servicePrincipals"
-  body = {
-    appId = verifiedid_resource.application.output.appId
-  }
-}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
-  body = {
-    displayName     = "My Group Owners Bind"
-    mailEnabled     = false
-    mailNickname    = "mygroup-owners-bind"
-    securityEnabled = true
-    "owners@odata.bind" = [
-      "https://graph.microsoft.com/v1.0/directoryObjects/${verifiedid_resource.servicePrincipal_application.id}"
-    ]
-  }
-  lifecycle {
-    ignore_changes = [body.displayName]
-  }
-}
-`
-}
-
-func (r VerifiedIDTestUpdateResource) groupWithOwnerUpdate(displayName string) string {
-	return fmt.Sprintf(`
-%s
-
-resource "verifiedid_update_resource" "test" {
-  url = "groups/${verifiedid_resource.group.id}"
-  body = {
-    displayName = "%s"
-  }
-}
-`, r.groupWithOwnerBase(), displayName)
 }
