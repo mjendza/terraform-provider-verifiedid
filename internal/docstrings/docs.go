@@ -15,7 +15,9 @@ func Url(kind string) string {
   - Create a new resource: POST "/verifiableCredentials/authorities/{authority-id}/contracts"
   - Read an existing resource: GET "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}"
   - Update an existing resource: PATCH "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}"
-  - Delete (soft) an existing resource: PATCH "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}" with body {"status": "Disabled"} — this provider does not issue HTTP DELETE; on destroy the resource is marked disabled and remains in the tenant.
+  - Delete an existing resource: HTTP DELETE on the item URL.
+
+  ~> **Soft delete for contracts** The Microsoft Entra Verified ID Admin API does not support HTTP DELETE on contracts. When the resource URL targets a contracts collection (` + "`verifiableCredentials/authorities/{authority-id}/contracts`" + `), this provider performs a soft delete on destroy by issuing PATCH ` + "`{\"status\": \"Disabled\"}`" + ` against the item URL. The contract remains in the tenant in a Disabled state. For all other resources (authorities, Microsoft Graph entities, ` + "`$ref`" + ` relationships) the provider issues a regular HTTP DELETE.
 
   More information about the Microsoft Entra Verified ID API can be found at [Microsoft Entra Verified ID API overview](https://learn.microsoft.com/en-us/entra/verified-id/admin-api).  
   And there are some [examples](https://github.com/mjendza/terraform-provider-verifiedid/tree/main/examples/quickstarts) to help you get started.

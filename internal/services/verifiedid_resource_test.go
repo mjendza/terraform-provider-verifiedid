@@ -12,6 +12,7 @@ import (
 	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance"
 	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance/check"
 	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/services"
 	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
@@ -143,8 +144,15 @@ func (r VerifiedIDTestResource) Exists(ctx context.Context, client *clients.Clie
 
 	checkUrl := fmt.Sprintf("%s/%s", url, state.ID)
 
-	_, err := client.VerifiedIDClient.Read(ctx, checkUrl, apiVersion, clients.DefaultRequestOptions())
+	body, err := client.VerifiedIDClient.Read(ctx, checkUrl, apiVersion, clients.DefaultRequestOptions())
 	if err == nil {
+		// Verified ID contracts cannot be HTTP DELETEd; on destroy the provider
+		// soft-deletes them by patching status=Disabled. Treat a disabled
+		// contract as "no longer present" for CheckDestroy purposes.
+		if services.IsContractURL(url) && contractStatusIsDisabled(body) {
+			b := false
+			return &b, nil
+		}
 		b := true
 		return &b, nil
 	}
@@ -153,6 +161,21 @@ func (r VerifiedIDTestResource) Exists(ctx context.Context, client *clients.Clie
 		return &b, nil
 	}
 	return nil, fmt.Errorf("checking for presence of existing %s(api_version=%s) resource: %w", state.ID, apiVersion, err)
+}
+
+// contractStatusIsDisabled returns true when the JSON response body decoded
+// from the Verified ID API contains a top-level "status" property equal to
+// "Disabled" (case-insensitive).
+func contractStatusIsDisabled(body interface{}) bool {
+	m, ok := body.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	status, ok := m["status"].(string)
+	if !ok {
+		return false
+	}
+	return strings.EqualFold(status, "Disabled")
 }
 
 func (r VerifiedIDTestResource) ImportIdFunc(tfState *terraform.State) (string, error) {
