@@ -313,7 +313,7 @@ func (r *VerifiedIDResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	var bodyToUpdate interface{}
-	
+
 	// Determine which body to use for the PATCH request
 	if model.PatchAsFullBody.ValueBool() {
 		// Use the full body from Terraform state

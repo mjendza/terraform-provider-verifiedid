@@ -97,6 +97,57 @@ Run a single acceptance test:
 go test ./internal/services -run TestAccVerifiedIDResource_basic -v -timeout 60m
 ```
 
+### Lint (golangci-lint)
+
+This repo uses [`golangci-lint`](https://golangci-lint.run/) (config: [.golangci.yml](.golangci.yml)) — analogous to Roslyn analyzers in C#.
+
+Install it once:
+
+**Linux / macOS / WSL**
+```sh
+# pinned binary install (matches the version used by `make tools`)
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
+  | sh -s -- -b $(go env GOPATH)/bin v1.61.0
+# or via Homebrew
+brew install golangci-lint
+```
+
+**Windows (PowerShell)**
+```powershell
+# via Scoop
+scoop install golangci-lint
+# or via Chocolatey
+choco install golangci-lint
+# or with go install (matches the pinned version)
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61.0
+```
+
+Make sure `$(go env GOPATH)/bin` (Linux/macOS) or `%USERPROFILE%\go\bin` (Windows) is on your `PATH`.
+
+Run the linter against the whole module:
+
+```sh
+golangci-lint run ./...
+```
+
+Or via the Makefile (Linux/macOS/WSL/Git Bash):
+
+```sh
+make lint
+```
+
+Lint a single package while iterating:
+
+```sh
+golangci-lint run ./internal/services/...
+```
+
+Auto-fix the issues that support it:
+
+```sh
+golangci-lint run ./... --fix
+```
+
 ### Other useful developer commands
 
 | Task | Command | C# analogue |
