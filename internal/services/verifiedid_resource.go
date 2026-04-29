@@ -313,7 +313,7 @@ func (r *VerifiedIDResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	var bodyToUpdate interface{}
-	
+
 	// Determine which body to use for the PATCH request
 	if model.PatchAsFullBody.ValueBool() {
 		// Use the full body from Terraform state
@@ -437,21 +437,82 @@ func (r *VerifiedIDResource) Delete(ctx context.Context, req resource.DeleteRequ
 	defer cancel()
 
 	var itemUrl string
-	if strings.HasSuffix(model.Url.ValueString(), "/$ref") {
+	isRef := strings.HasSuffix(model.Url.ValueString(), "/$ref")
+	if isRef {
 		itemUrl = strings.ReplaceAll(model.Url.ValueString(), "/$ref", fmt.Sprintf("/%s/$ref", model.Id.ValueString()))
 	} else {
 		itemUrl = fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString())
+	}
+
+	// Microsoft Entra Verified ID contracts do not support HTTP DELETE
+	// (see https://learn.microsoft.com/en-us/entra/verified-id/admin-api).
+	// For contracts we soft-delete by patching status=Disabled. All other
+	// resources (authorities, Microsoft Graph entities, $ref relationships)
+	// use HTTP DELETE as documented.
+	if !isRef && IsContractURL(model.Url.ValueString()) {
+		options := clients.RequestOptions{
+			QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.UpdateQueryParameters)),
+			RetryOptions:    clients.NewRetryOptions(model.Retry),
+		}
+		disableBody := map[string]interface{}{"status": "Disabled"}
+		if _, err := r.client.Update(ctx, itemUrl, model.ApiVersion.ValueString(), disableBody, options); err != nil {
+			resp.Diagnostics.AddError("Failed to disable resource", err.Error())
+			return
+		}
+		tflog.Info(ctx, fmt.Sprintf("Soft-deleted contract %q via PATCH status=Disabled", itemUrl))
+		return
 	}
 
 	options := clients.RequestOptions{
 		QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.DeleteQueryParameters)),
 		RetryOptions:    clients.NewRetryOptions(model.Retry),
 	}
-	err := r.client.Delete(ctx, itemUrl, model.ApiVersion.ValueString(), options)
-	if err != nil {
+	if err := r.client.Delete(ctx, itemUrl, model.ApiVersion.ValueString(), options); err != nil {
+		if utils.ResponseErrorWasNotFound(err) {
+			return
+		}
 		resp.Diagnostics.AddError("Failed to delete resource", err.Error())
 		return
 	}
+}
+
+// IsContractURL reports whether the given resource collection URL targets the
+// Microsoft Entra Verified ID Contracts endpoint, which does not support HTTP
+// DELETE and therefore must be soft-deleted via PATCH status=Disabled.
+//
+// Matches collection URLs of the form:
+//
+//	verifiableCredentials/authorities/{authorityId}/contracts
+//	/v1.0/verifiableCredentials/authorities/{authorityId}/contracts
+//	verifiableCredentials/authorities/{authorityId}/contracts/  (trailing slash)
+//
+// Match is case-insensitive on the segment names; query strings are ignored.
+func IsContractURL(rawURL string) bool {
+	if rawURL == "" {
+		return false
+	}
+	u := rawURL
+	if i := strings.IndexAny(u, "?#"); i >= 0 {
+		u = u[:i]
+	}
+	u = strings.Trim(u, "/")
+	lower := strings.ToLower(u)
+	// Must contain the verifiableCredentials/authorities/.../contracts pattern
+	const authoritiesSeg = "verifiablecredentials/authorities/"
+	idx := strings.Index(lower, authoritiesSeg)
+	if idx < 0 {
+		return false
+	}
+	tail := lower[idx+len(authoritiesSeg):]
+	parts := strings.Split(tail, "/")
+	// Need at least: {authorityId}/contracts
+	if len(parts) < 2 {
+		return false
+	}
+	if parts[0] == "" {
+		return false
+	}
+	return parts[1] == "contracts"
 }
 
 func (r *VerifiedIDResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {

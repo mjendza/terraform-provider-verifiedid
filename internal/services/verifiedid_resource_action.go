@@ -71,7 +71,7 @@ func (r *VerifiedIDResourceAction) Schema(ctx context.Context, req resource.Sche
 			},
 
 			"resource_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of the resource to perform the action on. This should be the full resource path, for example `applications/12345678-1234-1234-1234-123456789abc` or `users/user@example.com`. You can use the `resource_url` output from `verifiedid_resource`.",
+				MarkdownDescription: "The URL of the resource to perform the action on. This should be the full resource path, for example `verifiableCredentials/authorities/12345678-1234-1234-1234-123456789abc` or `verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}`. You can use the `resource_url` output from `verifiedid_resource`.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

@@ -9,29 +9,27 @@ func ApiVersion() string {
 func Url(kind string) string {
 	switch kind {
 	case "data":
-		return "The URL of the data source. It supports both collection URL which is used to list resources, for example `/users`, and item URL which is used to read an individual resource, for example `/users/{id}`."
+		return "The URL of the data source. It supports both collection URL which is used to list resources, for example `/verifiableCredentials/authorities/{authority-id}/contracts`, and item URL which is used to read an individual resource, for example `/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}`."
 	case "resource":
-		return `The URL which is used to manage the resource. It supports two types of URLs:  
-  - Collection URL which is used to make a POST request to create a new resource, for example, "/users", it must support the following operations:
-	- Create a new resource: POST "/users"
-    - Read an existing resource: GET "/users/{id}"
-    - Update an existing resource: PATCH "/users/{id}"
-    - Delete an existing resource: DELETE "/users/{id} "
-  - URL which has a "$ref" suffix, for example, "/groups/{group-id}/members/$ref", it must support the following operations:
-	- Add a reference to a resource: POST "/groups/{group-id}/members/$ref"
-	- Remove a reference to a resource: DELETE "/groups/{group-id}/members/{id}/$ref"
-  
-  More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).  
+		return `The URL which is used to manage the resource. It is the collection URL used to make a POST request to create a new resource, for example, "/verifiableCredentials/authorities/{authority-id}/contracts", and it must support the following operations:
+  - Create a new resource: POST "/verifiableCredentials/authorities/{authority-id}/contracts"
+  - Read an existing resource: GET "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}"
+  - Update an existing resource: PATCH "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}"
+  - Delete an existing resource: HTTP DELETE on the item URL.
+
+  ~> **Soft delete for contracts** The Microsoft Entra Verified ID Admin API does not support HTTP DELETE on contracts. When the resource URL targets a contracts collection (` + "`verifiableCredentials/authorities/{authority-id}/contracts`" + `), this provider performs a soft delete on destroy by issuing PATCH ` + "`{\"status\": \"Disabled\"}`" + ` against the item URL. The contract remains in the tenant in a Disabled state. For all other resources (authorities, Microsoft Graph entities, ` + "`$ref`" + ` relationships) the provider issues a regular HTTP DELETE.
+
+  More information about the Microsoft Entra Verified ID API can be found at [Microsoft Entra Verified ID API overview](https://learn.microsoft.com/en-us/entra/verified-id/admin-api).  
   And there are some [examples](https://github.com/mjendza/terraform-provider-verifiedid/tree/main/examples/quickstarts) to help you get started.
 `
 	case "update_resource":
-		return `The item URL of the existing resource to update, for example "/users/{id}".
+		return `The item URL of the existing resource to update, for example "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}".
 
 	This resource performs PATCH requests against the item URL and expects the following operations to be supported by the API endpoint:
-		- Read an existing resource: GET "/users/{id}"
-		- Update an existing resource: PATCH "/users/{id}"
+		- Read an existing resource: GET "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}"
+		- Update an existing resource: PATCH "/verifiableCredentials/authorities/{authority-id}/contracts/{contract-id}"
 
-	More information about the Microsoft Graph API can be found at [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview).  
+	More information about the Microsoft Entra Verified ID API can be found at [Microsoft Entra Verified ID API overview](https://learn.microsoft.com/en-us/entra/verified-id/admin-api).  
 	There are also [examples](https://github.com/mjendza/terraform-provider-verifiedid/tree/main/examples/quickstarts) to help you get started.`
 	default:
 		return ""

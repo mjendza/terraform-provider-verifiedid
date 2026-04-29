@@ -74,15 +74,10 @@ func (r VerifiedIDResourceActionTestResource) Exists(ctx context.Context, client
 
 func (r VerifiedIDResourceActionTestResource) basic() string {
 	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
+resource "verifiedid_resource" "application" {
+  url = "applications"
   body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
+    displayName = "Test Application"
   }
 
   lifecycle {
@@ -91,11 +86,11 @@ resource "verifiedid_resource" "group" {
 }
 
 resource "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
+  resource_url = verifiedid_resource.application.resource_url
   method       = "PATCH"
 
   body = {
-    displayName = "Updated Group Name"
+    displayName = "Updated Application Name"
   }
 }
 `
@@ -103,15 +98,10 @@ resource "verifiedid_resource_action" "test" {
 
 func (r VerifiedIDResourceActionTestResource) withQueryParams() string {
 	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
+resource "verifiedid_resource" "application" {
+  url = "applications"
   body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
+    displayName = "Test Application"
   }
 
   lifecycle {
@@ -120,7 +110,7 @@ resource "verifiedid_resource" "group" {
 }
 
 resource "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
+  resource_url = verifiedid_resource.application.resource_url
   method       = "PATCH"
 
   query_parameters = {
@@ -128,7 +118,7 @@ resource "verifiedid_resource_action" "test" {
   }
 
   body = {
-    displayName = "Updated Group Name with Query Params"
+    displayName = "Updated Application Name with Query Params"
   }
 }
 `
@@ -136,15 +126,10 @@ resource "verifiedid_resource_action" "test" {
 
 func (r VerifiedIDResourceActionTestResource) withHeaders() string {
 	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
+resource "verifiedid_resource" "application" {
+  url = "applications"
   body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
+    displayName = "Test Application"
   }
 
   lifecycle {
@@ -153,7 +138,7 @@ resource "verifiedid_resource" "group" {
 }
 
 resource "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
+  resource_url = verifiedid_resource.application.resource_url
   method       = "PATCH"
 
   headers = {
@@ -162,7 +147,7 @@ resource "verifiedid_resource_action" "test" {
   }
 
   body = {
-    displayName = "Updated Group Name with Headers"
+    displayName = "Updated Application Name with Headers"
   }
 }
 `
@@ -170,15 +155,10 @@ resource "verifiedid_resource_action" "test" {
 
 func (r VerifiedIDResourceActionTestResource) withExportValues() string {
 	return `
-provider "msgraph" {}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
+resource "verifiedid_resource" "application" {
+  url = "applications"
   body = {
-    displayName     = "Test Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
+    displayName = "Test Application"
   }
 
   lifecycle {
@@ -187,16 +167,16 @@ resource "verifiedid_resource" "group" {
 }
 
 resource "verifiedid_resource_action" "test" {
-  resource_url = verifiedid_resource.group.resource_url
+  resource_url = verifiedid_resource.application.resource_url
   method       = "PATCH"
 
   body = {
-    displayName = "Updated Group Name with Export Values"
+    displayName = "Updated Application Name with Export Values"
   }
 
   response_export_values = {
-    group_id   = "id"
-    group_name = "displayName"
+    application_id   = "id"
+    application_name = "displayName"
   }
 }
 `

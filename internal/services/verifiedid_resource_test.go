@@ -12,6 +12,7 @@ import (
 	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance"
 	"github.com/mjendza/terraform-provider-verifiedid/internal/acceptance/check"
 	"github.com/mjendza/terraform-provider-verifiedid/internal/clients"
+	"github.com/mjendza/terraform-provider-verifiedid/internal/services"
 	"github.com/mjendza/terraform-provider-verifiedid/internal/utils"
 )
 
@@ -66,27 +67,6 @@ func TestAcc_ResourceUpdate(t *testing.T) {
 	})
 }
 
-func TestAcc_ResourceGroupMember(t *testing.T) {
-	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
-
-	r := VerifiedIDTestResource{}
-
-	importStep := data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...)
-	importStep.ImportStateVerify = false
-	data.ResourceTest(t, r, []resource.TestStep{
-		{
-			Config: r.groupMember(),
-			Check: resource.ComposeTestCheckFunc(
-				check.That(data.ResourceName).Exists(r),
-				check.That(data.ResourceName).Key("id").IsUUID(),
-				check.That(data.ResourceName).Key("id").MatchesOtherKey(check.That("verifiedid_resource.servicePrincipal_application").Key("id")),
-				check.That(data.ResourceName).Key("resource_url").MatchesRegex(regexp.MustCompile(`^groups/[a-f0-9\-]+/members/[a-f0-9\-]+$`)),
-			),
-		},
-		importStep,
-	})
-}
-
 func TestAcc_ResourceIgnoreMissingProperty(t *testing.T) {
 	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
 
@@ -94,41 +74,11 @@ func TestAcc_ResourceIgnoreMissingProperty(t *testing.T) {
 
 	data.ResourceTest(t, r, []resource.TestStep{
 		{
-			Config: r.groupOwnerBind("My Group Owners Bind"),
+			Config: r.basicWithIgnoreMissingProperty(data),
 			Check: resource.ComposeTestCheckFunc(
 				check.That(data.ResourceName).Exists(r),
 				check.That(data.ResourceName).Key("id").IsUUID(),
-				check.That(data.ResourceName).Key("resource_url").MatchesRegex(regexp.MustCompile(`^groups/[a-f0-9\-]+$`)),
-			),
-		},
-		data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...),
-	})
-}
-
-func TestAcc_ResourceGroupOwnerBind_UpdateDisplayName(t *testing.T) {
-	data := acceptance.BuildTestData(t, "verifiedid_resource", "test")
-
-	r := VerifiedIDTestResource{}
-
-	importStep := data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...)
-	importStep.ImportStateVerify = false
-
-	data.ResourceTest(t, r, []resource.TestStep{
-		{
-			Config: r.groupOwnerBind("My Group Owners Bind"),
-			Check: resource.ComposeTestCheckFunc(
-				check.That(data.ResourceName).Exists(r),
-				check.That(data.ResourceName).Key("id").IsUUID(),
-				check.That(data.ResourceName).Key("resource_url").MatchesRegex(regexp.MustCompile(`^groups/[a-f0-9\-]+$`)),
-			),
-		},
-		data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...),
-		{
-			Config: r.groupOwnerBind("My Group Owners Bind Updated"),
-			Check: resource.ComposeTestCheckFunc(
-				check.That(data.ResourceName).Exists(r),
-				check.That(data.ResourceName).Key("id").IsUUID(),
-				check.That(data.ResourceName).Key("resource_url").MatchesRegex(regexp.MustCompile(`^groups/[a-f0-9\-]+$`)),
+				check.That(data.ResourceName).Key("resource_url").MatchesRegex(regexp.MustCompile(`^applications/[a-f0-9\-]+$`)),
 			),
 		},
 		data.ImportStepWithImportStateIdFunc(r.ImportIdFunc, defaultIgnores()...),
@@ -192,15 +142,17 @@ func (r VerifiedIDTestResource) Exists(ctx context.Context, client *clients.Clie
 	apiVersion := state.Attributes["api_version"]
 	url := state.Attributes["url"]
 
-	var checkUrl string
-	if !strings.Contains(url, "/$ref") {
-		checkUrl = fmt.Sprintf("%s/%s", url, state.ID)
-	} else {
-		checkUrl = url
-	}
+	checkUrl := fmt.Sprintf("%s/%s", url, state.ID)
 
-	_, err := client.VerifiedIDClient.Read(ctx, checkUrl, apiVersion, clients.DefaultRequestOptions())
+	body, err := client.VerifiedIDClient.Read(ctx, checkUrl, apiVersion, clients.DefaultRequestOptions())
 	if err == nil {
+		// Verified ID contracts cannot be HTTP DELETEd; on destroy the provider
+		// soft-deletes them by patching status=Disabled. Treat a disabled
+		// contract as "no longer present" for CheckDestroy purposes.
+		if services.IsContractURL(url) && contractStatusIsDisabled(body) {
+			b := false
+			return &b, nil
+		}
 		b := true
 		return &b, nil
 	}
@@ -211,13 +163,25 @@ func (r VerifiedIDTestResource) Exists(ctx context.Context, client *clients.Clie
 	return nil, fmt.Errorf("checking for presence of existing %s(api_version=%s) resource: %w", state.ID, apiVersion, err)
 }
 
+// contractStatusIsDisabled returns true when the JSON response body decoded
+// from the Verified ID API contains a top-level "status" property equal to
+// "Disabled" (case-insensitive).
+func contractStatusIsDisabled(body interface{}) bool {
+	m, ok := body.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	status, ok := m["status"].(string)
+	if !ok {
+		return false
+	}
+	return strings.EqualFold(status, "Disabled")
+}
+
 func (r VerifiedIDTestResource) ImportIdFunc(tfState *terraform.State) (string, error) {
 	state := tfState.RootModule().Resources["verifiedid_resource.test"].Primary
 	url := state.Attributes["url"]
-	if !strings.Contains(url, "/$ref") {
-		return fmt.Sprintf("%s/%s", url, state.ID), nil
-	}
-	return strings.ReplaceAll(url, "/$ref", fmt.Sprintf("/%s/$ref", state.ID)), nil
+	return strings.TrimRight(url, "/") + "/" + state.ID, nil
 }
 
 func (r VerifiedIDTestResource) basic(data acceptance.TestData) string {
@@ -242,76 +206,21 @@ resource "verifiedid_resource" "test" {
 `
 }
 
-func (r VerifiedIDTestResource) groupMember() string {
+func (r VerifiedIDTestResource) basicWithIgnoreMissingProperty(data acceptance.TestData) string {
 	return `
-resource "verifiedid_resource" "application" {
+resource "verifiedid_resource" "test" {
   url = "applications"
   body = {
-    displayName = "My Application"
-  }
-  response_export_values = {
-    appId = "appId"
-  }
-}
-
-resource "verifiedid_resource" "servicePrincipal_application" {
-  url = "servicePrincipals"
-  body = {
-    appId = verifiedid_resource.application.output.appId
-  }
-}
-
-resource "verifiedid_resource" "group" {
-  url = "groups"
-  body = {
-    displayName     = "My Group"
-    mailEnabled     = false
-    mailNickname    = "mygroup"
-    securityEnabled = true
-  }
-}
-
-resource "verifiedid_resource" "test" {
-  url = "groups/${verifiedid_resource.group.id}/members/$ref"
-  body = {
-    "@odata.id" = "https://graph.microsoft.com/v1.0/directoryObjects/${verifiedid_resource.servicePrincipal_application.id}"
-  }
-}
-`
-}
-
-func (r VerifiedIDTestResource) groupOwnerBind(displayName string) string {
-	return fmt.Sprintf(`
-resource "verifiedid_resource" "application" {
-  url = "applications"
-  body = {
-    displayName = "My Application"
-  }
-  response_export_values = {
-    appId = "appId"
-  }
-}
-
-resource "verifiedid_resource" "servicePrincipal_application" {
-  url = "servicePrincipals"
-  body = {
-    appId = verifiedid_resource.application.output.appId
-  }
-}
-
-resource "verifiedid_resource" "test" {
-  url = "groups"
-  body = {
-    displayName     = "%s"
-    mailEnabled     = false
-    mailNickname    = "mygroup-owners-bind"
-    securityEnabled = true
-    "owners@odata.bind" = [
-      "https://graph.microsoft.com/v1.0/directoryObjects/${verifiedid_resource.servicePrincipal_application.id}"
+    displayName = "Demo App With Ignore Missing Property"
+    passwordCredentials = [
+      {
+        displayName = "demo-credential"
+      }
     ]
   }
+  ignore_missing_property = true
 }
-`, displayName)
+`
 }
 
 func (r VerifiedIDTestResource) withRetry() string {

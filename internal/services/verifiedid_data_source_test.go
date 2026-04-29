@@ -111,7 +111,7 @@ data "verifiedid_resource" "test" {
 func (r VerifiedIDTestDataSource) list(data acceptance.TestData) string {
 	return `
 data "verifiedid_resource" "test" {
-  url = "groups"
+  url = "applications"
   response_export_values = {
     all = "@"
   }
@@ -121,7 +121,7 @@ data "verifiedid_resource" "test" {
 func (r VerifiedIDTestDataSource) withRetry(data acceptance.TestData) string {
 	return `
 data "verifiedid_resource" "test" {
-  url = "groups"
+  url = "applications"
   retry = {
     error_message_regex = [
       "temporary error",
