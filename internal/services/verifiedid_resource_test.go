@@ -266,3 +266,4 @@ resource "verifiedid_resource" "test" {
 }
 `
 }
+

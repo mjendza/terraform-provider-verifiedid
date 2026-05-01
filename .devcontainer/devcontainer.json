@@ -1,0 +1,39 @@
+{
+  "name": "Terraform Provider VerifiedID",
+  "image": "mcr.microsoft.com/devcontainers/go:1",
+  "features": {
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "latest",
+      "installTFsec": false,
+      "installTerragrunt": false
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {}
+  },
+  "postCreateCommand": "make tools",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "hashicorp.terraform",
+        "editorconfig.editorconfig",
+        "ms-vscode.makefile-tools"
+      ],
+      "settings": {
+        "go.lintTool": "golangci-lint",
+        "go.lintFlags": [
+          "--timeout=20m"
+        ],
+        "go.formatTool": "gofumpt",
+        "go.useLanguageServer": true,
+        "editor.formatOnSave": true,
+        "[go]": {
+          "editor.defaultFormatter": "golang.go"
+        },
+        "[terraform]": {
+          "editor.defaultFormatter": "hashicorp.terraform",
+          "editor.formatOnSave": true
+        }
+      }
+    }
+  }
+}

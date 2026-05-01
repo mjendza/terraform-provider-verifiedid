@@ -25,7 +25,9 @@ website/node_modules
 *.iml
 *.test
 *.iml
-
+cert/
+reference/
+*.secret
 website/vendor
 
 # Test exclusions
