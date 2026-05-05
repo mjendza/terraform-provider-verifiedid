@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -67,6 +68,16 @@ func BuildTestClient() (*clients.Client, error) {
 			model.ClientCertificate = types.StringValue(v)
 		}
 		if v := os.Getenv("ARM_CLIENT_CERTIFICATE_PATH"); v != "" {
+			// `go test ./...` runs each package with CWD = package directory, so
+			// a relative path like `./cert/cert.pfx` would otherwise resolve
+			// against e.g. internal/services/ and fail. Anchor it to the repo
+			// root (the dir containing go.mod) to keep the env var working
+			// regardless of which package is under test.
+			if !filepath.IsAbs(v) {
+				if root, err := repoRoot(); err == nil {
+					v = filepath.Join(root, v)
+				}
+			}
 			model.ClientCertificatePath = types.StringValue(v)
 		}
 		if v := os.Getenv("ARM_CLIENT_CERTIFICATE_PASSWORD"); v != "" {
@@ -130,4 +141,23 @@ func BuildTestClient() (*clients.Client, error) {
 	}
 
 	return _client, nil
+}
+
+// repoRoot walks up from the current working directory looking for go.mod and
+// returns the directory containing it.
+func repoRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", fmt.Errorf("go.mod not found above %s", dir)
+		}
+		dir = parent
+	}
 }

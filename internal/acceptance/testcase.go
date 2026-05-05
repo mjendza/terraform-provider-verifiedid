@@ -3,6 +3,7 @@ package acceptance
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
@@ -161,6 +162,20 @@ func (td TestData) externalProviders() map[string]resource.ExternalProvider {
 }
 
 func PreCheck(t *testing.T) {
+	// `go test ./internal/services` (or any subpackage) sets the test process
+	// CWD to that package directory, so a relative ARM_CLIENT_CERTIFICATE_PATH
+	// like `./cert/cert.pfx` would resolve under e.g. internal/services/ and
+	// fail. Anchor it to the repo root before the provider's Configure() reads
+	// the env var. Production behavior (provider.go) is unchanged.
+	if v := os.Getenv("ARM_CLIENT_CERTIFICATE_PATH"); v != "" && !filepath.IsAbs(v) {
+		if root, err := repoRoot(); err == nil {
+			abs := filepath.Join(root, v)
+			if _, err := os.Stat(abs); err == nil {
+				_ = os.Setenv("ARM_CLIENT_CERTIFICATE_PATH", abs)
+			}
+		}
+	}
+
 	if v := os.Getenv("TF_ACC"); v == "" {
 		t.Fatalf(`TF_ACC must be set for acceptance tests!
 For tests that authenticate with Azure by using a Service Principal, the following environment variables must be set:
@@ -178,6 +193,53 @@ For tests that authenticate with Azure by using a Service Principal with Certifi
 - ARM_TENANT_ID
 `)
 	}
+
+	if !hasAcceptanceCredentials() {
+		t.Fatalf(`acceptance tests need credentials for the Verified ID Admin API. Set ONE of:
+  - ARM_CLIENT_ID + ARM_CLIENT_SECRET + ARM_TENANT_ID                     (service principal + secret)
+  - ARM_CLIENT_ID + ARM_TENANT_ID + ARM_CLIENT_CERTIFICATE_PATH           (service principal + certificate)
+  - ARM_CLIENT_ID + ARM_TENANT_ID + ARM_USE_OIDC=true                     (OIDC, e.g. GitHub Actions)
+  - ARM_USE_CLI=true                                                      (Azure CLI, after 'az login')
+
+ARM_USE_CLI defaults to true, so if you intended to use 'az login' make sure
+ARM_USE_CLI is not explicitly set to "false". See docs/guides/ for details.`)
+	}
+}
+
+// hasAcceptanceCredentials reports whether at least one credential mode that
+// the provider's ChainedTokenCredential can satisfy is configured. The goal is
+// to fail loudly on partial SP setups (e.g. ARM_CLIENT_ID set but
+// ARM_CLIENT_SECRET missing) instead of silently falling through to Azure CLI
+// and producing a confusing 401 mid-test.
+func hasAcceptanceCredentials() bool {
+	clientID := os.Getenv("ARM_CLIENT_ID")
+	tenantID := os.Getenv("ARM_TENANT_ID")
+	clientSecret := os.Getenv("ARM_CLIENT_SECRET")
+	certPath := os.Getenv("ARM_CLIENT_CERTIFICATE_PATH")
+	cert := os.Getenv("ARM_CLIENT_CERTIFICATE")
+	useOIDC := os.Getenv("ARM_USE_OIDC") == "true"
+	useCLI := os.Getenv("ARM_USE_CLI")
+
+	if useOIDC {
+		return clientID != "" && tenantID != ""
+	}
+
+	// If the user supplied any SP-style credential bits, validate the full
+	// triple — partial SP setup is the most common silent-failure mode.
+	spIntent := clientID != "" || clientSecret != "" || certPath != "" || cert != ""
+	if spIntent {
+		if clientID != "" && tenantID != "" && clientSecret != "" {
+			return true
+		}
+		if clientID != "" && tenantID != "" && (certPath != "" || cert != "") {
+			return true
+		}
+		return false
+	}
+
+	// No SP env at all -> rely on Azure CLI (provider default; see
+	// testclient.go where ARM_USE_CLI defaults to true).
+	return useCLI == "" || useCLI == "true"
 }
 
 // CheckDestroyedFunc returns a TestCheckFunc which validates the resource no longer exists
