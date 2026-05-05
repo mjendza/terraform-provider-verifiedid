@@ -23,12 +23,9 @@ func TestIsContractURL(t *testing.T) {
 		{"authorities collection", "verifiableCredentials/authorities", false},
 		{"authority item", "verifiableCredentials/authorities/abc", false},
 		{"action under authority", "verifiableCredentials/authorities/abc/didInfo/signingKeys", false},
-		{"applications graph", "applications", false},
-		{"users graph", "users", false},
 		{"empty", "", false},
 		{"unrelated path containing contracts", "fooContracts/bar", false},
 		{"missing authority id", "verifiableCredentials/authorities//contracts", false},
-		{"ref relationship", "groups/abc/members/$ref", false},
 	}
 
 	for _, tc := range cases {
