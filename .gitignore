@@ -28,6 +28,7 @@ website/node_modules
 cert/
 reference/
 *.secret
+.env
 website/vendor
 
 # Test exclusions

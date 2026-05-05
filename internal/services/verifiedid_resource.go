@@ -444,22 +444,43 @@ func (r *VerifiedIDResource) Delete(ctx context.Context, req resource.DeleteRequ
 		itemUrl = fmt.Sprintf("%s/%s", model.Url.ValueString(), model.Id.ValueString())
 	}
 
-	// Microsoft Entra Verified ID contracts do not support HTTP DELETE
-	// (see https://learn.microsoft.com/en-us/entra/verified-id/admin-api).
-	// For contracts we soft-delete by patching status=Disabled. All other
-	// resources (authorities, Microsoft Graph entities, $ref relationships)
-	// use HTTP DELETE as documented.
+	// Microsoft Entra Verified ID contracts do not support HTTP DELETE and the
+	// Admin API does not expose a per-contract disable endpoint either: the
+	// `status` field on a contract is documented as "Always Enabled" and the
+	// API silently ignores attempts to PATCH it. The only documented per-
+	// contract decommission knob is `availableInVcDirectory=false` (removes
+	// the contract from the Verified ID Network).
+	// See https://learn.microsoft.com/entra/verified-id/admin-api#contracts.
+	//
+	// To make destroys observable (so terraform CheckDestroy and any external
+	// tooling can tell a destroyed contract apart from a live one) we PATCH
+	// the contract on Delete with:
+	//   1. availableInVcDirectory = false  (documented decommission)
+	//   2. ContractSoftDeletedMarker appended to every display.card.description
+	//
+	// PATCH bodies must be full bodies (the API rejects partial bodies with
+	// "rulesFile is a required value"), so we round-trip the state body and
+	// strip the immutable / server-owned fields the API rejects.
 	if !isRef && IsContractURL(model.Url.ValueString()) {
 		options := clients.RequestOptions{
 			QueryParameters: clients.NewQueryParameters(AsMapOfLists(model.UpdateQueryParameters)),
 			RetryOptions:    clients.NewRetryOptions(model.Retry),
 		}
-		disableBody := map[string]interface{}{"status": "Disabled"}
+		disableBody := map[string]interface{}{}
+		if err := unmarshalBody(model.Body, &disableBody); err != nil {
+			resp.Diagnostics.AddError("Failed to unmarshal body for soft-delete", err.Error())
+			return
+		}
+		for _, k := range []string{"id", "name", "status", "manifestUrl", "issuerId", "authorityId", "issueNotificationAllowedToGroupOids"} {
+			delete(disableBody, k)
+		}
+		disableBody["availableInVcDirectory"] = false
+		markContractDisplaysSoftDeleted(disableBody)
 		if _, err := r.client.Update(ctx, itemUrl, model.ApiVersion.ValueString(), disableBody, options); err != nil {
 			resp.Diagnostics.AddError("Failed to disable resource", err.Error())
 			return
 		}
-		tflog.Info(ctx, fmt.Sprintf("Soft-deleted contract %q via PATCH status=Disabled", itemUrl))
+		tflog.Info(ctx, fmt.Sprintf("Soft-deleted contract %q via PATCH (availableInVcDirectory=false + display marker)", itemUrl))
 		return
 	}
 
@@ -476,9 +497,72 @@ func (r *VerifiedIDResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 }
 
+// ContractSoftDeletedMarker is the sentinel substring the provider appends to
+// every display.card.description when a contract is soft-deleted. The Verified
+// ID Admin API does not expose a per-contract delete or disable mechanism (the
+// `status` field is read-only "Enabled"), so the provider marks the displays
+// to make destroyed contracts observably distinct from live ones.
+const ContractSoftDeletedMarker = "[terraform soft-deleted]"
+
+// markContractDisplaysSoftDeleted mutates body["displays"] in place, appending
+// ContractSoftDeletedMarker to every display.card.description. Idempotent: a
+// description that already contains the marker is left unchanged.
+func markContractDisplaysSoftDeleted(body map[string]interface{}) {
+	displays, ok := body["displays"].([]interface{})
+	if !ok {
+		return
+	}
+	for _, d := range displays {
+		dm, ok := d.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		card, ok := dm["card"].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		desc, _ := card["description"].(string)
+		if strings.Contains(desc, ContractSoftDeletedMarker) {
+			continue
+		}
+		if desc == "" {
+			card["description"] = ContractSoftDeletedMarker
+		} else {
+			card["description"] = desc + " " + ContractSoftDeletedMarker
+		}
+	}
+}
+
+// IsContractSoftDeleted reports whether the GET response body for a contract
+// carries the soft-delete sentinel that the provider applies in Delete.
+func IsContractSoftDeleted(body interface{}) bool {
+	m, ok := body.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	displays, ok := m["displays"].([]interface{})
+	if !ok {
+		return false
+	}
+	for _, d := range displays {
+		dm, ok := d.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		card, ok := dm["card"].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if desc, _ := card["description"].(string); strings.Contains(desc, ContractSoftDeletedMarker) {
+			return true
+		}
+	}
+	return false
+}
+
 // IsContractURL reports whether the given resource collection URL targets the
 // Microsoft Entra Verified ID Contracts endpoint, which does not support HTTP
-// DELETE and therefore must be soft-deleted via PATCH status=Disabled.
+// DELETE and therefore must be soft-deleted via PATCH (see Delete for details).
 //
 // Matches collection URLs of the form:
 //

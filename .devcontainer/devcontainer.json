@@ -9,6 +9,7 @@
     },
     "ghcr.io/devcontainers/features/azure-cli:1": {}
   },
+  "runArgs": ["--env-file", "${localWorkspaceFolder}/.env"],
   "postCreateCommand": "make tools",
   "customizations": {
     "vscode": {

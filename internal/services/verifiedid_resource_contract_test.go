@@ -38,7 +38,7 @@ type VerifiedIDContractTestResource struct {
 func TestAcc_ContractUpdate(t *testing.T) {
 	authorityID := os.Getenv(envVerifiedIDAuthorityID)
 	if authorityID == "" {
-		t.Skipf("skipping: %s is not set", envVerifiedIDAuthorityID)
+		t.Skipf("skipping %s: set %s to a pre-provisioned Verified ID Authority GUID (see README \"Acceptance tests\" section)", t.Name(), envVerifiedIDAuthorityID)
 	}
 
 	data := acceptance.BuildTestData(t, "verifiedid_resource", "contract")
@@ -77,7 +77,7 @@ func TestAcc_ContractUpdate(t *testing.T) {
 func TestAcc_ContractSoftDelete(t *testing.T) {
 	authorityID := os.Getenv(envVerifiedIDAuthorityID)
 	if authorityID == "" {
-		t.Skipf("skipping: %s is not set", envVerifiedIDAuthorityID)
+		t.Skipf("skipping %s: set %s to a pre-provisioned Verified ID Authority GUID (see README \"Acceptance tests\" section)", t.Name(), envVerifiedIDAuthorityID)
 	}
 
 	data := acceptance.BuildTestData(t, "verifiedid_resource", "contract")
@@ -99,8 +99,11 @@ func TestAcc_ContractSoftDelete(t *testing.T) {
 	})
 }
 
-// Exists treats a contract whose status has been flipped to Disabled as
-// "no longer present". This is what soft delete means for contracts.
+// Exists treats a contract whose displays carry the provider's soft-delete
+// marker as "no longer present". The Verified ID Admin API has no per-contract
+// delete or disable endpoint, so the provider's Delete instead PATCHes
+// availableInVcDirectory=false and appends services.ContractSoftDeletedMarker
+// to display descriptions; that marker is what we check here.
 func (r VerifiedIDContractTestResource) Exists(ctx context.Context, client *clients.Client, state *terraform.InstanceState) (*bool, error) {
 	apiVersion := state.Attributes["api_version"]
 	url := state.Attributes["url"]
@@ -108,7 +111,7 @@ func (r VerifiedIDContractTestResource) Exists(ctx context.Context, client *clie
 
 	body, err := client.VerifiedIDClient.Read(ctx, checkUrl, apiVersion, clients.DefaultRequestOptions())
 	if err == nil {
-		if services.IsContractURL(url) && contractStatusIsDisabled(body) {
+		if services.IsContractURL(url) && services.IsContractSoftDeleted(body) {
 			b := false
 			return &b, nil
 		}
@@ -128,7 +131,7 @@ resource "verifiedid_resource" "contract" {
   url                = "verifiableCredentials/authorities/%[1]s/contracts"
   patch_as_full_body = true
   body = {
-    name = "tfacc-%[2]s"
+    name = "tfacc %[2]s"
     rules = {
       attestations = {
         idTokenHints = [
